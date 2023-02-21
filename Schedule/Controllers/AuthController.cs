@@ -1,4 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MoviesCatalog.Models;
+using Schedule.Models.DTO;
+using Schedule.Services;
 
 namespace Schedule.Controllers
 {
@@ -6,26 +11,50 @@ namespace Schedule.Controllers
     [Route("auth")]
     public class AuthController : ControllerBase
     {
-        // TODO: create DTO for staff\admin registration purposes
+        private readonly IAuthService _authService;
+        public AuthController(IAuthService authService)
+        {
+            _authService = authService;
+        }
+
         [HttpPost("register")]
-        public IActionResult Register() { return Ok(); }
+        public IActionResult Register(RegistrationDTO user) { return Ok(); }
 
-        // TODO: create DTO for teacher's registration purposes
         [HttpPost("register/teacher")]
-        public IActionResult RegisterTeacher() { return Ok(); }
+        public IActionResult RegisterTeacher(TeacherRegistrationDTO teacher) { return Ok(); }
 
-        // TODO: create DTO for student's registration purposes
         [HttpPost("register/student")]
-        public IActionResult RegisterStudent() { return Ok(); }
+        public IActionResult RegisterStudent(StudentRegistrationDTO student) { return Ok(); }
 
         // TODO: create DTO for login creds & token creation
         [HttpPost("login/mobile")]
-        public IActionResult MobileLogin() { return Ok(); }
+        public async Task<IActionResult> MobileLogin(LoginCredentials credentials) 
+        {
+            try
+            {
+                return await _authService.MobileLogin(credentials);
+            }
+            catch (BadHttpRequestException e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
 
         [HttpPost("login/web")]
-        public IActionResult WebLogin() { return Ok(); }
-        // TODO: token blacklisting
+        public async Task<IActionResult?> WebLogin(LoginCredentials credentials) 
+        {
+            var token = await _authService.WebLogin(credentials);
+            if (token is null)
+            {
+                return Forbid();
+            }
+
+            return token;
+        }
+
+        [Authorize(Policy = "NotBlacklisted")]
         [HttpPost("logout")]
-        public IActionResult Logout() { return Ok(); }
+        public async Task Logout() =>
+            await _authService.Logout(Request.Headers.Authorization);
     }
 }
