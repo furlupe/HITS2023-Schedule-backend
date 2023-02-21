@@ -19,9 +19,11 @@ namespace Schedule.Controllers
         public IActionResult RegisterStudent() { return Ok(); }
 
         // TODO: create DTO for login creds & token creation
-        [HttpPost("login")]
-        public IActionResult Login() { return Ok(); }
+        [HttpPost("login/mobile")]
+        public IActionResult MobileLogin() { return Ok(); }
 
+        [HttpPost("login/web")]
+        public IActionResult WebLogin() { return Ok(); }
         // TODO: token blacklisting
         [HttpPost("logout")]
         public IActionResult Logout() { return Ok(); }
