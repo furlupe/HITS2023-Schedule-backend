@@ -9,6 +9,9 @@ namespace Schedule.Models.DTO
         [Required]
         public string Password { get; set; }
         [Required]
-        public Role Role { get; set; }
+        public Guid Role { get; set; }
+        
+        public Guid? TeacherID { get; set; }
+        public Guid? GroupID { get; set; }
     }
 }

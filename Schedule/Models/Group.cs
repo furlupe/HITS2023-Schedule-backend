@@ -6,6 +6,6 @@ namespace Schedule.Models
     {
         [Key]
         public int Number { get; set; }
-        public ICollection<Student> Students { get; set; }
+        public ICollection<User> Students { get; set; }
     }
 }
