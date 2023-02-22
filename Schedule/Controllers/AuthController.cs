@@ -28,9 +28,26 @@ namespace Schedule.Controllers
             try
             {
                 var roleClaim =  User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-                Enum.TryParse(roleClaim.Value, out Role role);
+                Enum.TryParse(roleClaim.Value, out Role sendByRole);
 
-                await _authService.Register(user, role);
+                switch(user.Role)
+                {
+                    case Role.STUDENT: await _authService.RegisterStudent(user); break;
+                    case Role.TEACHER: await _authService.RegisterTeacher(user); break;
+                    case Role.EDITOR: await _authService.RegisterStaff(user); break;
+                    case Role.ADMIN:
+                        {
+                            if(sendByRole is not Role.ROOT)
+                            {
+                                throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR);
+                            }
+                            await _authService.RegisterStaff(user); 
+                            break;
+                        }
+                    case Role.ROOT: throw new BadHttpRequestException(ErrorStrings.ROOT_GIVEN_ERROR);
+                    default: throw new BadHttpRequestException("", 500);
+                }
+
                 return Ok();
             }
             catch (BadHttpRequestException e) 
@@ -39,7 +56,6 @@ namespace Schedule.Controllers
             }
         }
 
-        // TODO: create DTO for login creds & token creation
         [HttpPost("login/mobile")]
         public async Task<IActionResult> MobileLogin(LoginCredentials credentials) 
         {

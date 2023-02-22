@@ -23,95 +23,58 @@ namespace Schedule.Services
         {
             _context = context;
         }
-        public async Task Register(RegistrationDTO user, Role registeredBy)
+
+        public async Task RegisterStudent(RegistrationDTO student)
         {
-            Teacher? teacher = null;
-            Group? group = null;
-            switch (user.Role)
+            var group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == student.GroupNumber);
+            if(group is null)
             {
-                case Role.STUDENT:
-                    {
-                        if (user.GroupNumber is null)
-                        {
-                            throw new BadHttpRequestException(ErrorStrings.STUDENT_NO_GROUP_ERROR);
-                        }
-
-                        if (user.TeacherID is not null)
-                        {
-                            throw new BadHttpRequestException(ErrorStrings.STUDENT_TEACHER_GIVEN_ERROR);
-                        }
-
-                        group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == user.GroupNumber);
-                        if (group is null) 
-                        {
-                            throw new BadHttpRequestException(ErrorStrings.GROUP_WRONG_ID_ERROR);
-                        }
-
-                        break;
-                    }
-                case Role.TEACHER:
-                    {
-                        if (user.TeacherID is null)
-                        {
-                            throw new BadHttpRequestException(ErrorStrings.TEACHER_NO_ID_ERROR);
-                        }
-
-                        if (user.GroupNumber is not null)
-                        {
-                            throw new BadHttpRequestException(ErrorStrings.TEACHER_GROUP_GIVEN_ERROR);
-                        }
-
-                        teacher = await _context.Teachers.SingleOrDefaultAsync(t => t.Id == user.TeacherID);
-                        if (teacher is null)
-                        {
-                            throw new BadHttpRequestException(ErrorStrings.TEACHER_WRONG_ID_ERROR);
-                        }
-
-                        if (await _context.Users.AnyAsync(u => u.TeacherProfile == teacher))
-                        {
-                            throw new BadHttpRequestException(ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR);
-                        }
-
-                        break;
-                    }
-                case Role.EDITOR:
-                case Role.ADMIN: 
-                    {
-                        if (user.GroupNumber is not null)
-                        {
-                            throw new BadHttpRequestException(ErrorStrings.EDITOR_ADMIN_GROUP_GIVEN_ERROR);
-                        }
-
-                        if (user.TeacherID is not null)
-                        {
-                            throw new BadHttpRequestException(ErrorStrings.EDITOR_ADMIN_TEACHER_GIVEN_ERROR);
-                        }
-                        if(user.Role == Role.ADMIN && registeredBy != Role.ROOT)
-                        {
-                            throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR);
-                        }
-                    }
-                    break;
-                case Role.ROOT: 
-                    throw new BadHttpRequestException(ErrorStrings.ROOT_GIVEN_ERROR);
-                default: break;
+                throw new BadHttpRequestException(ErrorStrings.GROUP_WRONG_ID_ERROR);
             }
 
-            if (await _context.Users.AnyAsync(u => u.Login == user.Login))
+            await Register(new User
             {
-                throw new BadHttpRequestException(ErrorStrings.LOGIN_TAKEN_ERROR);
-            }
-
-            await _context.Users.AddAsync(new User
-            {
-                Login = user.Login,
-                Password = EncodePassword(user.Password),
-                Role = user.Role,
-                TeacherProfile = teacher,
-                Group = group
+                Login = student.Login,
+                Password = EncodePassword(student.Password),
+                Role = student.Role,
+                Group = group,
+                TeacherProfile = null
             });
-            await _context.SaveChangesAsync();
         }
+        public async Task RegisterTeacher(RegistrationDTO teacher)
+        {
+            var t = await _context.Teachers.SingleOrDefaultAsync(t => t.Id == teacher.TeacherID);
+            if (t is null)
+            {
+                throw new BadHttpRequestException(ErrorStrings.TEACHER_WRONG_ID_ERROR);
+            }
+
+            if (await _context.Users.AnyAsync(u => u.TeacherProfile == t))
+            {
+                throw new BadHttpRequestException(ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR);
+            }
+
+            await Register(new User
+            {
+                Login = teacher.Login,
+                Password = EncodePassword(teacher.Password),
+                Role = teacher.Role,
+                Group = null,
+                TeacherProfile = t
+            });
+        }
+        public async Task RegisterStaff(RegistrationDTO staff)
+        {
+            await Register(new User
+            {
+                Login = staff.Login,
+                Password = EncodePassword(staff.Password),
+                Role = staff.Role,
+                Group = null,
+                TeacherProfile = null
+            });
+        }
+
         public async Task<JsonResult> MobileLogin(LoginCredentials credentials)
         {
             var user = await GetUserByCredentials(credentials);
@@ -123,7 +86,6 @@ namespace Schedule.Services
 
             return CreateToken(user);
         }
-
         public async Task<JsonResult> WebLogin(LoginCredentials credentials)
         {
             var user = await GetUserByCredentials(credentials);
@@ -143,6 +105,16 @@ namespace Schedule.Services
                 Value = token
             });
 
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task Register(User user)
+        {
+            if(await _context.Users.AnyAsync(u => u.Login == user.Login))
+            {
+                throw new BadHttpRequestException(ErrorStrings.LOGIN_TAKEN_ERROR);
+            }
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
         }
         private async Task<User?> GetUserByCredentials(LoginCredentials credentials)
