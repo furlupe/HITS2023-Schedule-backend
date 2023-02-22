@@ -106,7 +106,16 @@ namespace Schedule {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Can&apos;t register a ROOT-role user.
+        ///   Looks up a localized string similar to User must have ROOT right in order to execute that action.
+        /// </summary>
+        public static string NOT_A_ROOT_ERROR {
+            get {
+                return ResourceManager.GetString("NOT_A_ROOT_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Access denied.
         /// </summary>
         public static string ROOT_GIVEN_ERROR {
             get {

@@ -23,7 +23,7 @@ namespace Schedule.Services
         {
             _context = context;
         }
-        public async Task Register(RegistrationDTO user)
+        public async Task Register(RegistrationDTO user, Role registeredBy)
         {
             Teacher? teacher = null;
             Group? group = null;
@@ -85,6 +85,10 @@ namespace Schedule.Services
                         if (user.TeacherID is not null)
                         {
                             throw new BadHttpRequestException(ErrorStrings.EDITOR_ADMIN_TEACHER_GIVEN_ERROR);
+                        }
+                        if(user.Role == Role.ADMIN && registeredBy != Role.ROOT)
+                        {
+                            throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR);
                         }
                     }
                     break;

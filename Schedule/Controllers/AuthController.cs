@@ -6,6 +6,7 @@ using Schedule.Enums;
 using Schedule.Models.DTO;
 using Schedule.Services;
 using Schedule.Utils;
+using System.Security.Claims;
 
 namespace Schedule.Controllers
 {
@@ -26,7 +27,10 @@ namespace Schedule.Controllers
         {
             try
             {
-                await _authService.Register(user);
+                var roleClaim =  User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+                Enum.TryParse(roleClaim.Value, out Role role);
+
+                await _authService.Register(user, role);
                 return Ok();
             }
             catch (BadHttpRequestException e) 

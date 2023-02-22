@@ -132,8 +132,11 @@
   <data name="LOGIN_TAKEN_ERROR" xml:space="preserve">
     <value>Login is already taken</value>
   </data>
+  <data name="NOT_A_ROOT_ERROR" xml:space="preserve">
+    <value>User must have ROOT right in order to execute that action</value>
+  </data>
   <data name="ROOT_GIVEN_ERROR" xml:space="preserve">
-    <value>Can't register a ROOT-role user</value>
+    <value>Access denied</value>
   </data>
   <data name="STUDENT_NO_GROUP_ERROR" xml:space="preserve">
     <value>Student given, yet no group was specified</value>
