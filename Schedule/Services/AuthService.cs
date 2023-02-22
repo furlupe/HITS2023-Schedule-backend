@@ -32,20 +32,10 @@ namespace Schedule.Services
         {
             throw new NotImplementedException();
         }
-        public async Task<JsonResult> MobileLogin(LoginCredentials credentials)
+        public async Task<JsonResult> Login(LoginCredentials credentials)
         {
             var user = await GetUserByCredentials(credentials);
-            if (user is null || user.Role.Name != "COMMON")
-            {
-                throw new BadHttpRequestException("Invalid credentials");
-            }
-
-            return CreateToken(user);
-        }
-        public async Task<JsonResult> WebLogin(LoginCredentials credentials)
-        {
-            var user = await GetUserByCredentials(credentials);
-            if (user is null || user.Role.Name == "COMMON")
+            if (user is null)
             {
                 throw new BadHttpRequestException("Invalid credentials");
             }

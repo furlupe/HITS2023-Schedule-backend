@@ -27,29 +27,17 @@ namespace Schedule.Controllers
         public IActionResult RegisterStudent(StudentRegistrationDTO student) { return Ok(); }
 
         // TODO: create DTO for login creds & token creation
-        [HttpPost("login/mobile")]
-        public async Task<IActionResult> MobileLogin(LoginCredentials credentials) 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginCredentials credentials) 
         {
             try
             {
-                return await _authService.MobileLogin(credentials);
+                return await _authService.Login(credentials);
             }
             catch (BadHttpRequestException e)
             {
                 return BadRequest(new { error = e.Message });
             }
-        }
-
-        [HttpPost("login/web")]
-        public async Task<IActionResult?> WebLogin(LoginCredentials credentials) 
-        {
-            var token = await _authService.WebLogin(credentials);
-            if (token is null)
-            {
-                return Forbid();
-            }
-
-            return token;
         }
 
         [Authorize(Policy = "NotBlacklisted")]

@@ -8,8 +8,7 @@ namespace Schedule.Services
         Task Register(RegistrationDTO user);
         Task RegisterStudent(StudentRegistrationDTO student);
         Task RegisterTeacher(TeacherRegistrationDTO teacher);
-        Task<JsonResult> MobileLogin(LoginCredentials user);
-        Task<JsonResult> WebLogin(LoginCredentials user);
+        Task<JsonResult> Login(LoginCredentials user);
         Task Logout(string token);
     }
 }
