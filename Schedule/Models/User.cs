@@ -1,4 +1,6 @@
-﻿namespace Schedule.Models
+﻿using Schedule.Enums;
+
+namespace Schedule.Models
 {
     public class User
     {

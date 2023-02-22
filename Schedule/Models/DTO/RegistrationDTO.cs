@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Schedule.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Schedule.Models.DTO
 {
@@ -9,9 +10,9 @@ namespace Schedule.Models.DTO
         [Required]
         public string Password { get; set; }
         [Required]
-        public Guid Role { get; set; }
+        public Role Role { get; set; }
         
         public Guid? TeacherID { get; set; }
-        public Guid? GroupID { get; set; }
+        public int? GroupNumber { get; set; }
     }
 }

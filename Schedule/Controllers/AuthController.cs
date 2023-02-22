@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MoviesCatalog.Models;
+using Schedule.Enums;
 using Schedule.Models.DTO;
 using Schedule.Services;
+using Schedule.Utils;
 
 namespace Schedule.Controllers
 {
@@ -18,7 +20,20 @@ namespace Schedule.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(RegistrationDTO user) { return Ok(); }
+        [RoleAuthorization(Role.ADMIN | Role.ROOT)]
+        [Authorize(Policy = "NotBlacklisted")]
+        public async Task<IActionResult> Register(RegistrationDTO user) 
+        {
+            try
+            {
+                await _authService.Register(user);
+                return Ok();
+            }
+            catch (BadHttpRequestException e) 
+            {
+                return BadRequest(new {error = e.Message});
+            }
+        }
 
         // TODO: create DTO for login creds & token creation
         [HttpPost("login/mobile")]
