@@ -10,14 +10,6 @@ namespace Schedule.Controllers
         [HttpPost("register")]
         public IActionResult Register() { return Ok(); }
 
-        // TODO: create DTO for teacher's registration purposes
-        [HttpPost("register/teacher")]
-        public IActionResult RegisterTeacher() { return Ok(); }
-
-        // TODO: create DTO for student's registration purposes
-        [HttpPost("register/student")]
-        public IActionResult RegisterStudent() { return Ok(); }
-
         // TODO: create DTO for login creds & token creation
         [HttpPost("login/mobile")]
         public IActionResult MobileLogin() { return Ok(); }
