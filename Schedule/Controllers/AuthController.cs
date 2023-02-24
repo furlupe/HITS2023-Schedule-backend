@@ -59,7 +59,7 @@ namespace Schedule.Controllers
         {
             try
             {
-                return Ok(await _authService.MobileLogin(credentials));
+                return await _authService.MobileLogin(credentials);
             }
             catch (BadHttpRequestException e)
             {
@@ -72,7 +72,7 @@ namespace Schedule.Controllers
         {
             try
             {
-                return Ok(await _authService.WebLogin(credentials));
+                return await _authService.WebLogin(credentials);
             }
             catch (BadHttpRequestException e)
             {
