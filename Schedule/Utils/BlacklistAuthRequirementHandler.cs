@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Schedule.Utils;
 using System.Text;
 
-namespace MoviesCatalog.Utils
+namespace Schedule.Utils
 {
     public class BlacklistAuthRequirementHandler : AuthorizationHandler<BlacklistAuthRequirement>
     {

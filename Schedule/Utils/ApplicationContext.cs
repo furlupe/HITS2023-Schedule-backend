@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MoviesCatalog.Models;
+using Schedule.Models;
 using Schedule.Models;
 
 namespace Schedule.Utils

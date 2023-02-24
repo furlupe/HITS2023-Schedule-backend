@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using MoviesCatalog.Models;
-using MoviesCatalog.Utils;
+using Schedule.Models;
+using Schedule.Utils;
 using Schedule.Enums;
 using Schedule.Models;
 using Schedule.Models.DTO;

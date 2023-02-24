@@ -1,4 +1,4 @@
-﻿namespace MoviesCatalog.Models
+﻿namespace Schedule.Models
 {
     public class BlacklistedToken
     {

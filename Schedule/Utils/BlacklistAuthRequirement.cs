@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace MoviesCatalog.Utils
+namespace Schedule.Utils
 {
     public class BlacklistAuthRequirement : IAuthorizationRequirement
     {

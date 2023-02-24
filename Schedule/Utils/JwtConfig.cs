@@ -1,7 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace MoviesCatalog.Utils
+namespace Schedule.Utils
 {
     public class JwtConfigurations
     {
