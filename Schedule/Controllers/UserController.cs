@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Schedule.Enums;
+using Schedule.Exceptions;
 using Schedule.Models.DTO;
 using Schedule.Services;
 using Schedule.Utils;
@@ -21,7 +22,7 @@ namespace Schedule.Controllers
 
         [HttpGet("me")]
         [Authorize(Policy = "NotBlacklisted")]
-        public async Task<ActionResult<UserShortInfoDto>> GetUser()
+        public async Task<ActionResult<UserInfoDto>> GetUser()
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
 
@@ -33,7 +34,7 @@ namespace Schedule.Controllers
         [HttpGet("{id}")]
         [RoleAuthorization(Role.ADMIN | Role.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
-        public async Task<ActionResult<UserShortInfoDto>> GetUser([BindRequired] Guid id)
+        public async Task<ActionResult<UserInfoDto>> GetUser([BindRequired] Guid id)
         {
             try
             {
@@ -45,13 +46,47 @@ namespace Schedule.Controllers
             }
         }
 
-        // TODO: create DTO for user changed info
         [HttpPut("{id}")]
         [RoleAuthorization(Role.ADMIN | Role.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
-        public IActionResult UpdateUser([BindRequired] Guid id)
+        public async Task<IActionResult> UpdateUser(UserInfoDto data, [BindRequired] Guid id)
         {
-            return Ok();
+            var roleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+            Enum.TryParse(roleClaim.Value, out Role sendByRole);
+
+            try
+            {
+                switch (data.Role)
+                {
+                    case Role.STUDENT: await _userService.UpdateToStudent(id, data); break;
+                    case Role.TEACHER: await _userService.UpdateToTeacher(id, data); break;
+                    case Role.EDITOR: await _userService.UpdateToStaff(id, data); break;
+                    case Role.ADMIN:
+                        {
+                            if (sendByRole is not Role.ROOT)
+                            {
+                                throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR);
+                            }
+                            await _userService.UpdateToStaff(id, data); break;
+                        }
+                    case Role.ROOT: throw new ForbiddenException();
+                    default: throw new BadHttpRequestException("", 500);
+                }
+
+                return Ok();
+            }
+            catch (BadHttpRequestException e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+            catch (ForbiddenException e)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden);
+            }
+            catch (InternalServerException e) 
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpDelete("{id}")]

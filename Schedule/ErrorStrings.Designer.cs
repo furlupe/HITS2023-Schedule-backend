@@ -61,6 +61,51 @@ namespace Schedule {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Access denied.
+        /// </summary>
+        public static string ACCESS_DENIED {
+            get {
+                return ResourceManager.GetString("ACCESS_DENIED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Group w/ number = {0} does not exist.
+        /// </summary>
+        public static string GROUP_WRONG_NUMBER_ERROR {
+            get {
+                return ResourceManager.GetString("GROUP_WRONG_NUMBER_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User must have ROOT rights in order to execute that action.
+        /// </summary>
+        public static string NOT_A_ROOT_ERROR {
+            get {
+                return ResourceManager.GetString("NOT_A_ROOT_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Teacher w/ id= {0} is already taken.
+        /// </summary>
+        public static string TEACHER_ACCOUNT_EXISTS_ERROR {
+            get {
+                return ResourceManager.GetString("TEACHER_ACCOUNT_EXISTS_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Teacher w/ id= {0} does not exist.
+        /// </summary>
+        public static string TEACHER_WRONG_ID_ERROR {
+            get {
+                return ResourceManager.GetString("TEACHER_WRONG_ID_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User w/ id = {0} does not exist.
         /// </summary>
         public static string USER_WRONG_ID_ERROR {

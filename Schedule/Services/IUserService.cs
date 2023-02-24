@@ -4,8 +4,10 @@ namespace Schedule.Services
 {
     public interface IUserService
     {
-        Task<UserShortInfoDto> GetUser(Guid id);
-        Task UpdateUser(Guid id);
+        Task<UserInfoDto> GetUser(Guid id);
+        Task UpdateToStudent(Guid id, UserInfoDto data);
+        Task UpdateToTeacher(Guid id, UserInfoDto data);
+        Task UpdateToStaff(Guid id, UserInfoDto data);
         Task DeleteUser(Guid id);
     }
 }
