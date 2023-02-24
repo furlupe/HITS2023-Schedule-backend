@@ -28,7 +28,7 @@ namespace Schedule.Controllers
 
         [HttpGet("me")]
         [Authorize(Policy = "NotBlacklisted")]
-        public async Task<ActionResult<UserShortInfoDto>> GetUser()
+        public async Task<ActionResult<UserInfoDto>> GetUser()
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
 
@@ -40,7 +40,7 @@ namespace Schedule.Controllers
         [HttpGet("{id}")]
         [RoleAuthorization(Role.ADMIN | Role.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
-        public async Task<ActionResult<UserShortInfoDto>> GetUser([BindRequired] Guid id)
+        public async Task<ActionResult<UserInfoDto>> GetUser([BindRequired] Guid id)
         {
             try
             {
