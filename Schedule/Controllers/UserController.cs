@@ -11,7 +11,7 @@ using System.Security.Claims;
 namespace Schedule.Controllers
 {
     [ApiController]
-    [Route("user")]
+    [Route("users")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -19,10 +19,16 @@ namespace Schedule.Controllers
         {
             _userService = userService;
         }
+        [HttpGet]
+        [Authorize(Policy = "NotBlacklisted")]
+        public async Task<ActionResult<ICollection<UserInfoDto>>> GetListOfUsers([FromQuery(Name = "role")] ICollection<Role> roles)
+        {
+            return Ok(await _userService.GetUsers(roles));
+        }
 
         [HttpGet("me")]
         [Authorize(Policy = "NotBlacklisted")]
-        public async Task<ActionResult<UserInfoDto>> GetUser()
+        public async Task<ActionResult<UserShortInfoDto>> GetUser()
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
 
@@ -34,7 +40,7 @@ namespace Schedule.Controllers
         [HttpGet("{id}")]
         [RoleAuthorization(Role.ADMIN | Role.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
-        public async Task<ActionResult<UserInfoDto>> GetUser([BindRequired] Guid id)
+        public async Task<ActionResult<UserShortInfoDto>> GetUser([BindRequired] Guid id)
         {
             try
             {
@@ -49,7 +55,7 @@ namespace Schedule.Controllers
         [HttpPut("{id}")]
         [RoleAuthorization(Role.ADMIN | Role.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
-        public async Task<IActionResult> UpdateUser(UserInfoDto data, [BindRequired] Guid id)
+        public async Task<IActionResult> UpdateUser(UserShortInfoDto data, [BindRequired] Guid id)
         {
             var roleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
             Enum.TryParse(roleClaim.Value, out Role sendByRole);

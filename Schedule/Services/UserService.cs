@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Schedule.Enums;
 using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Utils;
@@ -17,19 +18,49 @@ namespace Schedule.Services
             _context.Users.Remove(await AccessUser(id));
             await _context.SaveChangesAsync();
         }
+        public async Task<ICollection<UserInfoDto>> GetUsers(ICollection<Role> roles)
+        {
+            var selectedUsers = new List<User>();
+            if (roles.Count > 0)
+            {
+                selectedUsers = await _context.Users
+                    .Where(u => roles.Contains(u.Role))
+                    .ToListAsync();
+            }
+            else
+            {
+                selectedUsers = await _context.Users.ToListAsync();
+            }
+
+            var users = new List<UserInfoDto>();
+            foreach (var user in selectedUsers)
+            {
+                users.Add(new UserInfoDto
+                {
+                    Id = user.Id,
+                    Login = user.Login,
+                    Role = user.Role,
+                    TeacherId = user.TeacherProfile is null ? null : user.TeacherProfile.Id,
+                    Group = user.Group is null ? null : user.Group.Number
+                });
+            }
+
+            return users;
+        }
         public async Task<UserInfoDto> GetUser(Guid id)
         {
             var user = await AccessUser(id);
 
             return new UserInfoDto
             {
+                Id = user.Id,
+                Login = user.Login,
                 Role = user.Role,
                 TeacherId = (user.TeacherProfile is null) ? null : user.TeacherProfile.Id,
                 Group = (user.Group is null) ? null : user.Group.Number
             };
         }
-
-        public async Task UpdateToStudent(Guid id, UserInfoDto data)
+        public async Task UpdateToStudent(Guid id, UserShortInfoDto data)
         {
             var group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == data.Group);
             if (group is null)
@@ -46,8 +77,7 @@ namespace Schedule.Services
                 Group = group
             });
         }
-
-        public async Task UpdateToTeacher(Guid id, UserInfoDto data)
+        public async Task UpdateToTeacher(Guid id, UserShortInfoDto data)
         {
             var t = await _context.Teachers.SingleOrDefaultAsync(t => t.Id == data.TeacherId);
             if (t is null)
@@ -71,8 +101,7 @@ namespace Schedule.Services
                 Group = null
             });
         }
-
-        public async Task UpdateToStaff(Guid id, UserInfoDto data)
+        public async Task UpdateToStaff(Guid id, UserShortInfoDto data)
         {
             await UpdateUser(id, new UserUpdateObject
             {
@@ -81,7 +110,6 @@ namespace Schedule.Services
                 Group = null
             });
         }
-
         private async Task UpdateUser(Guid id, UserUpdateObject data)
         {
             var user = await AccessUser(id);
