@@ -79,11 +79,11 @@ namespace Schedule.Controllers
             {
                 return BadRequest(new { error = e.Message });
             }
-            catch (ForbiddenException e)
+            catch (ForbiddenException)
             {
                 return StatusCode(StatusCodes.Status403Forbidden);
             }
-            catch (InternalServerException e) 
+            catch (InternalServerException)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
