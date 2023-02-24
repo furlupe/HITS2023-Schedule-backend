@@ -135,11 +135,11 @@
   <data name="NOT_A_ROOT_ERROR" xml:space="preserve">
     <value>User must have ROOT right in order to execute that action</value>
   </data>
-  <data name="ROOT_GIVEN_ERROR" xml:space="preserve">
+  <data name="ACCESS_DENIED" xml:space="preserve">
     <value>Access denied</value>
   </data>
-  <data name="STUDENT_NO_GROUP_ERROR" xml:space="preserve">
-    <value>Student given, yet no group was specified</value>
+  <data name="GROUP_WRONG_NUMBER_ERROR" xml:space="preserve">
+    <value>Group w/ number = {0} does not exist</value>
   </data>
   <data name="STUDENT_TEACHER_GIVEN_ERROR" xml:space="preserve">
     <value>Student given, yet teacher id was provided</value>
@@ -154,6 +154,9 @@
     <value>Teacher given, yet no id was specified</value>
   </data>
   <data name="TEACHER_WRONG_ID_ERROR" xml:space="preserve">
-    <value>Teacher w/ such id does not exist</value>
+    <value>Teacher w/ id= {0} does not exist</value>
+  </data>
+  <data name="USER_WRONG_ID_ERROR" xml:space="preserve">
+    <value>User w/ id = {0} does not exist</value>
   </data>
 </root>

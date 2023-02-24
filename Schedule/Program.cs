@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Schedule.Services;
 using Schedule.Utils;
 using Schedule.Services;
 using Schedule.Utils;
@@ -48,6 +49,7 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IAuthorizationHandler, BlacklistAuthRequirementHandler>();
+builder.Services.AddTransient<IUserService, UserService>();
 
 builder.Services.AddAuthorization(options =>
 {
