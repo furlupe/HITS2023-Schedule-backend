@@ -1,11 +1,11 @@
 ﻿using Schedule.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Schedule.Models.DTO
 {
-    public class UserInfoDto
+    public class UserShortInfoDto
     {
-        public Guid Id { get; set; }
-        public string Login { get; set; }
+        [Required]
         public Role Role { get; set; }
         public Guid? TeacherId { get; set; }
         public int? Group { get; set; }
