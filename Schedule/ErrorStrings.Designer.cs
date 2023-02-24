@@ -204,7 +204,11 @@ namespace Schedule {
         /// <summary>
         /// Looks up a localized string similar to User w/ id = {0} does not exist.
         /// </summary>
-        get {
+        
+        public static string USER_WRONG_ID_ERROR
+        {
+            get
+            {
                 return ResourceManager.GetString("USER_WRONG_ID_ERROR", resourceCulture);
             }
         }
