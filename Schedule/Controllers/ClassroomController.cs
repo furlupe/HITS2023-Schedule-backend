@@ -17,7 +17,7 @@ namespace Schedule.Controllers
         public IActionResult GetClassroomSchedule(
             [BindRequired] int number,
             [BindRequired] DateTime startsAt,
-            [BindRequired] DateTime endsAt )
+            [BindRequired] DateTime endsAt)
         {
             return Ok();
         }

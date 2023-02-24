@@ -1,4 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Schedule.Enums;
+using Schedule.Models.DTO;
+using Schedule.Services;
+using Schedule.Utils;
+using System.Security.Claims;
 
 namespace Schedule.Controllers
 {
@@ -6,26 +12,80 @@ namespace Schedule.Controllers
     [Route("auth")]
     public class AuthController : ControllerBase
     {
-        // TODO: create DTO for staff\admin registration purposes
+        private readonly IAuthService _authService;
+        public AuthController(IAuthService authService)
+        {
+            _authService = authService;
+        }
+
         [HttpPost("register")]
-        public IActionResult Register() { return Ok(); }
+        [RoleAuthorization(Role.ADMIN | Role.ROOT)]
+        [Authorize(Policy = "NotBlacklisted")]
+        public async Task<IActionResult> Register(RegistrationDTO user)
+        {
+            try
+            {
+                var roleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+                Enum.TryParse(roleClaim.Value, out Role sendByRole);
 
-        // TODO: create DTO for teacher's registration purposes
-        [HttpPost("register/teacher")]
-        public IActionResult RegisterTeacher() { return Ok(); }
+                switch (user.Role)
+                {
+                    case Role.STUDENT: await _authService.RegisterStudent(user); break;
+                    case Role.TEACHER: await _authService.RegisterTeacher(user); break;
+                    case Role.EDITOR: await _authService.RegisterStaff(user); break;
+                    case Role.ADMIN:
+                        {
+                            if (sendByRole is not Role.ROOT)
+                            {
+                                throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR);
+                            }
+                            await _authService.RegisterStaff(user);
+                            break;
+                        }
+                    case Role.ROOT: throw new BadHttpRequestException(ErrorStrings.ROOT_GIVEN_ERROR);
+                    default: throw new BadHttpRequestException("", 500);
+                }
 
-        // TODO: create DTO for student's registration purposes
-        [HttpPost("register/student")]
-        public IActionResult RegisterStudent() { return Ok(); }
+                return Ok();
+            }
+            catch (BadHttpRequestException e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
 
-        // TODO: create DTO for login creds & token creation
         [HttpPost("login/mobile")]
-        public IActionResult MobileLogin() { return Ok(); }
+        public async Task<IActionResult> MobileLogin(LoginCredentials credentials)
+        {
+            try
+            {
+                return await _authService.MobileLogin(credentials);
+            }
+            catch (BadHttpRequestException e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
 
         [HttpPost("login/web")]
-        public IActionResult WebLogin() { return Ok(); }
-        // TODO: token blacklisting
+        public async Task<IActionResult> WebLogin(LoginCredentials credentials)
+        {
+            try
+            {
+                return await _authService.WebLogin(credentials);
+            }
+            catch (BadHttpRequestException e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
+        }
+
+        [Authorize(Policy = "NotBlacklisted")]
         [HttpPost("logout")]
-        public IActionResult Logout() { return Ok(); }
+        public async Task<IActionResult> Logout()
+        {
+            await _authService.Logout(Request.Headers.Authorization);
+            return Ok();
+        }
     }
 }

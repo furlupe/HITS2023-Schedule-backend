@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Schedule.Utils;
+using Schedule.Services;
+using Schedule.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +46,7 @@ builder.Services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(c
 
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IAuthorizationHandler, BlacklistAuthRequirementHandler>();
 
 builder.Services.AddAuthorization(options =>
