@@ -68,7 +68,7 @@ namespace Schedule.Controllers
         }
 
         [HttpPost("login/web")]
-        public async Task<IActionResult?> WebLogin(LoginCredentials credentials)
+        public async Task<IActionResult> WebLogin(LoginCredentials credentials)
         {
             var token = await _authService.WebLogin(credentials);
             if (token is null)
