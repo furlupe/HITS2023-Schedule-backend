@@ -146,8 +146,7 @@ namespace Schedule.Services
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
-                new Claim("id", user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Id.ToString()),
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
