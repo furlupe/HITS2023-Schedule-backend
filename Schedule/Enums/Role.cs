@@ -2,9 +2,10 @@
 {
     public enum Role
     {
-        COMMON = 0,
-        EDITOR = 1,
-        ADMIN = 2,
-        ROOT = 3
+        STUDENT = 0,
+        TEACHER = 1,
+        EDITOR = 2,
+        ADMIN = 3,
+        ROOT = 4
     }
 }
