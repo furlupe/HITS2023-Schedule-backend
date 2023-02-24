@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MoviesCatalog.Models;
@@ -9,7 +8,6 @@ using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Utils;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -27,7 +25,7 @@ namespace Schedule.Services
         public async Task RegisterStudent(RegistrationDTO student)
         {
             var group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == student.GroupNumber);
-            if(group is null)
+            if (group is null)
             {
                 throw new BadHttpRequestException(ErrorStrings.GROUP_WRONG_ID_ERROR);
             }
@@ -78,7 +76,7 @@ namespace Schedule.Services
         public async Task<JsonResult> MobileLogin(LoginCredentials credentials)
         {
             var user = await GetUserByCredentials(credentials);
-            if (user is null || 
+            if (user is null ||
                 user.Role != Role.STUDENT && user.Role != Role.TEACHER)
             {
                 throw new BadHttpRequestException(ErrorStrings.INVALID_CREDENTIALS_ERROR);
@@ -89,8 +87,8 @@ namespace Schedule.Services
         public async Task<JsonResult> WebLogin(LoginCredentials credentials)
         {
             var user = await GetUserByCredentials(credentials);
-            if (user is null || 
-                user.Role == Role.STUDENT || 
+            if (user is null ||
+                user.Role == Role.STUDENT ||
                 user.Role == Role.TEACHER)
             {
                 throw new BadHttpRequestException(ErrorStrings.INVALID_CREDENTIALS_ERROR);
@@ -110,7 +108,7 @@ namespace Schedule.Services
 
         private async Task Register(User user)
         {
-            if(await _context.Users.AnyAsync(u => u.Login == user.Login))
+            if (await _context.Users.AnyAsync(u => u.Login == user.Login))
             {
                 throw new BadHttpRequestException(ErrorStrings.LOGIN_TAKEN_ERROR);
             }

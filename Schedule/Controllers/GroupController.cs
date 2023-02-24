@@ -7,8 +7,8 @@ namespace Schedule.Controllers
     [Route("groups")]
     public class GroupController : ControllerBase
     {
-        [HttpGet] 
-        public IActionResult GetAllGroups() 
+        [HttpGet]
+        public IActionResult GetAllGroups()
         {
             return Ok();
         }

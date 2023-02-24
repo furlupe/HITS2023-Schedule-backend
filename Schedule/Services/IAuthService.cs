@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Schedule.Enums;
 using Schedule.Models.DTO;
 
 namespace Schedule.Services
@@ -12,6 +11,7 @@ namespace Schedule.Services
 
         Task<JsonResult> MobileLogin(LoginCredentials user);
         Task<JsonResult> WebLogin(LoginCredentials user);
+
         Task Logout(string token);
     }
 }

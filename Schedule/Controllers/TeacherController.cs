@@ -17,7 +17,7 @@ namespace Schedule.Controllers
         public IActionResult GetTeacherSchedule(
             [BindRequired] Guid id,
             [BindRequired] DateTime startsAt,
-            [BindRequired] DateTime endsAt )
+            [BindRequired] DateTime endsAt)
         {
             return Ok();
         }

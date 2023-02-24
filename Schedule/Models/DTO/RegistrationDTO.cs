@@ -11,7 +11,7 @@ namespace Schedule.Models.DTO
         public string Password { get; set; }
         [Required]
         public Role Role { get; set; }
-        
+
         public Guid? TeacherID { get; set; }
         public int? GroupNumber { get; set; }
     }

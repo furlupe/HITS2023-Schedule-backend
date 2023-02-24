@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -6,7 +5,6 @@ using Microsoft.OpenApi.Models;
 using MoviesCatalog.Utils;
 using Schedule.Services;
 using Schedule.Utils;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -21,7 +21,7 @@ namespace Schedule.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteUser([BindRequired] Guid id) 
+        public IActionResult DeleteUser([BindRequired] Guid id)
         {
             return Ok();
         }

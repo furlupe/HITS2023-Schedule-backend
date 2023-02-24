@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MoviesCatalog.Models;
 using Schedule.Enums;
 using Schedule.Models.DTO;
 using Schedule.Services;
@@ -23,25 +21,25 @@ namespace Schedule.Controllers
         [HttpPost("register")]
         [RoleAuthorization(Role.ADMIN | Role.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
-        public async Task<IActionResult> Register(RegistrationDTO user) 
+        public async Task<IActionResult> Register(RegistrationDTO user)
         {
             try
             {
-                var roleClaim =  User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+                var roleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
                 Enum.TryParse(roleClaim.Value, out Role sendByRole);
 
-                switch(user.Role)
+                switch (user.Role)
                 {
                     case Role.STUDENT: await _authService.RegisterStudent(user); break;
                     case Role.TEACHER: await _authService.RegisterTeacher(user); break;
                     case Role.EDITOR: await _authService.RegisterStaff(user); break;
                     case Role.ADMIN:
                         {
-                            if(sendByRole is not Role.ROOT)
+                            if (sendByRole is not Role.ROOT)
                             {
                                 throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR);
                             }
-                            await _authService.RegisterStaff(user); 
+                            await _authService.RegisterStaff(user);
                             break;
                         }
                     case Role.ROOT: throw new BadHttpRequestException(ErrorStrings.ROOT_GIVEN_ERROR);
@@ -50,14 +48,14 @@ namespace Schedule.Controllers
 
                 return Ok();
             }
-            catch (BadHttpRequestException e) 
+            catch (BadHttpRequestException e)
             {
-                return BadRequest(new {error = e.Message});
+                return BadRequest(new { error = e.Message });
             }
         }
 
         [HttpPost("login/mobile")]
-        public async Task<IActionResult> MobileLogin(LoginCredentials credentials) 
+        public async Task<IActionResult> MobileLogin(LoginCredentials credentials)
         {
             try
             {
@@ -70,7 +68,7 @@ namespace Schedule.Controllers
         }
 
         [HttpPost("login/web")]
-        public async Task<IActionResult?> WebLogin(LoginCredentials credentials) 
+        public async Task<IActionResult?> WebLogin(LoginCredentials credentials)
         {
             var token = await _authService.WebLogin(credentials);
             if (token is null)
