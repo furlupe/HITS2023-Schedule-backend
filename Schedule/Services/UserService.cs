@@ -11,9 +11,17 @@ namespace Schedule.Services
         {
             _context = context;
         }
-        public Task DeleteUser(Guid id)
+        public async Task DeleteUser(Guid id)
         {
-            throw new NotImplementedException();
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == id);
+
+            if (user is null)
+            {
+                throw new BadHttpRequestException(string.Format(ErrorStrings.USER_WRONG_ID_ERROR, id));
+            }
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
         }
         public async Task<UserShortInfoDto> GetUser(Guid id)
         {
@@ -24,7 +32,7 @@ namespace Schedule.Services
 
             if (user is null)
             {
-                throw new BadHttpRequestException("User w/ such id does not exist");
+                throw new BadHttpRequestException(string.Format(ErrorStrings.USER_WRONG_ID_ERROR, id));
             }
 
             return new UserShortInfoDto

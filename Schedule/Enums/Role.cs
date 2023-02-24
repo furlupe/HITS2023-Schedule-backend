@@ -1,5 +1,6 @@
 ﻿namespace Schedule.Enums
 {
+    [Flags]
     public enum Role
     {
         STUDENT = 0,
