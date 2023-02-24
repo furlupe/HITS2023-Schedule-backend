@@ -59,7 +59,7 @@ namespace Schedule.Controllers
         {
             try
             {
-                return await _authService.MobileLogin(credentials);
+                return Ok(await _authService.MobileLogin(credentials));
             }
             catch (BadHttpRequestException e)
             {
@@ -70,18 +70,22 @@ namespace Schedule.Controllers
         [HttpPost("login/web")]
         public async Task<IActionResult> WebLogin(LoginCredentials credentials)
         {
-            var token = await _authService.WebLogin(credentials);
-            if (token is null)
+            try
             {
-                return Forbid();
+                return Ok(await _authService.WebLogin(credentials));
             }
-
-            return token;
+            catch (BadHttpRequestException e)
+            {
+                return BadRequest(new { error = e.Message });
+            }
         }
 
         [Authorize(Policy = "NotBlacklisted")]
         [HttpPost("logout")]
-        public async Task Logout() =>
+        public async Task<IActionResult> Logout()
+        {
             await _authService.Logout(Request.Headers.Authorization);
+            return Ok();
+        }
     }
 }
