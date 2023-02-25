@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Schedule.Models.DTO;
+using Schedule.Services;
 
 namespace Schedule.Controllers
 {
@@ -7,9 +9,16 @@ namespace Schedule.Controllers
     [Route("lesson")]
     public class LessonController : ControllerBase
     {
-        [HttpPost]
-        public IActionResult CreateLesson()
+        private readonly ILessonService _lessonService;
+
+        public LessonController(ILessonService lessonService)
         {
+            _lessonService = lessonService;
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateLesson(LessonCreateDTO lesson)
+        {
+            _lessonService.CreateLesson(lesson);
             return Ok();
         }
 
