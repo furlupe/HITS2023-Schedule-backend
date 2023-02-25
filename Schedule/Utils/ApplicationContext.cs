@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Schedule.Models;
-using Schedule.Models;
 
 namespace Schedule.Utils
 {
@@ -9,6 +8,9 @@ namespace Schedule.Utils
         public DbSet<User> Users { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
+        public DbSet<Cabinet> Cabinets { get; set; } 
+        public DbSet<Lesson> Lessons { get; set; }
+        public DbSet<Timeslot> Timeslots { get; set; }
         public DbSet<BlacklistedToken> Blacklist { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
