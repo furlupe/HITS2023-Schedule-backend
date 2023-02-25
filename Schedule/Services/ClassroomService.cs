@@ -23,5 +23,31 @@ namespace Schedule.Services
             }
             return response;
         }
+
+        public async Task<ScheduleDTO> GetSchedule(int num, DateTime start, DateTime ends)
+        {
+            var response = new ScheduleDTO();
+            var lessons = _context.Lessons.
+                Include(cab => cab.Cabinet).ThenInclude(cab => cab.Name).
+                Include(sub => sub.Subject).ThenInclude(sub => sub.Name).
+                Include(th => th.Teacher).ThenInclude(th => th.Name).
+                Include(gr => gr.Group).ThenInclude(group => group.Number).
+                Include(ts => ts.Timeslot).ThenInclude(timeslot => timeslot.StartsAt).
+                Include(ts => ts.Timeslot).ThenInclude(timeslot => timeslot.EndsAt).
+                Where(x => x.Cabinet.Number == num && x.Timeslot.StartsAt <= start && x.Timeslot.EndsAt >= ends).ToList();
+            foreach (var lesson in lessons)
+            {
+                response.Lessons.Add(new LessonDTO
+                {
+                    Name = lesson.Subject.Name,
+                    Cabinet = lesson.Cabinet.Name,
+                    Group = lesson.Group.Number,
+                    Teacher = lesson.Teacher.Name,
+                    Start = lesson.Timeslot.StartsAt,
+                    End= lesson.Timeslot.EndsAt
+                });
+            }
+            return response;
+        }
     }
 }

@@ -22,12 +22,12 @@ namespace Schedule.Controllers
         }
 
         [HttpGet("{number}/schedule")]
-        public IActionResult GetClassroomSchedule(
+        public async Task<ActionResult<ScheduleDTO>> GetClassroomSchedule(
             [BindRequired] int number,
             [BindRequired] DateTime startsAt,
             [BindRequired] DateTime endsAt)
         {
-            return Ok();
+            return Ok(await _classroomService.GetSchedule(number, startsAt, endsAt));
         }
     }
 }
