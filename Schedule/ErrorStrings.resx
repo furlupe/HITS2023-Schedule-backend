@@ -126,6 +126,9 @@
   <data name="NOT_A_ROOT_ERROR" xml:space="preserve">
     <value>User must have ROOT rights in order to execute that action</value>
   </data>
+  <data name="ROOT_GIVEN_ERROR" xml:space="preserve">
+    <value>Access denied</value>
+  </data>
   <data name="TEACHER_ACCOUNT_EXISTS_ERROR" xml:space="preserve">
     <value>Teacher w/ id= {0} is already taken</value>
   </data>

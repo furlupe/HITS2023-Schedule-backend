@@ -88,6 +88,15 @@ namespace Schedule {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Access denied.
+        /// </summary>
+        public static string ROOT_GIVEN_ERROR {
+            get {
+                return ResourceManager.GetString("ROOT_GIVEN_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Teacher w/ id= {0} is already taken.
         /// </summary>
         public static string TEACHER_ACCOUNT_EXISTS_ERROR {
