@@ -7,17 +7,17 @@ namespace Schedule.Services
     public class ClassroomService : IClassroomService
     {
         private readonly ApplicationContext _context;
-        
-        public ClassroomService(ApplicationContext context) 
+
+        public ClassroomService(ApplicationContext context)
         {
-            _context = context; 
+            _context = context;
         }
 
         public async Task<ClassroomListDTO> GetAllClassroom()
         {
             var response = new ClassroomListDTO();
             var classroomsModel = _context.Cabinets.ToList();
-            foreach (var classroom in classroomsModel) 
+            foreach (var classroom in classroomsModel)
             {
                 response.Classrooms.Add(classroom.Name);
             }
@@ -50,7 +50,7 @@ namespace Schedule.Services
                     Group = groups,
                     Teacher = lesson.Teacher.Name,
                     Start = lesson.Timeslot.StartsAt,
-                    End= lesson.Timeslot.EndsAt
+                    End = lesson.Timeslot.EndsAt
                 });
             }
             return response;

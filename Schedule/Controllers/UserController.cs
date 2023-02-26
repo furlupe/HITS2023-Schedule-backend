@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Schedule.Enums;
-using Schedule.Exceptions;
 using Schedule.Models.DTO;
 using Schedule.Services;
 using Schedule.Utils;
@@ -83,7 +82,7 @@ namespace Schedule.Controllers
             }
             catch (BadHttpRequestException e)
             {
-                return StatusCode(e.StatusCode, new { error = e.Message});
+                return StatusCode(e.StatusCode, new { error = e.Message });
             }
         }
 

@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Schedule.Services;
 using Schedule.Utils;
-using Schedule.Services;
-using Schedule.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -24,6 +24,8 @@ namespace Schedule.Services
             if (roles.Count > 0)
             {
                 selectedUsers = await _context.Users
+                    .Include(u => u.Group)
+                    .Include(u => u.TeacherProfile)
                     .Where(u => roles.Contains(u.Role))
                     .ToListAsync();
             }

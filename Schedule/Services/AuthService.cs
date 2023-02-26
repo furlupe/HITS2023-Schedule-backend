@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Schedule.Models;
-using Schedule.Utils;
 using Schedule.Enums;
+using Schedule.Models;
 using Schedule.Models.DTO;
+using Schedule.Utils;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Schedule.Services
 {
@@ -31,7 +29,7 @@ namespace Schedule.Services
             await Register(new User
             {
                 Login = student.Login,
-                Password = EncodePassword(student.Password),
+                Password = Credentials.EncodePassword(student.Password),
                 Role = student.Role,
                 Group = group,
                 TeacherProfile = null
@@ -53,7 +51,7 @@ namespace Schedule.Services
             await Register(new User
             {
                 Login = teacher.Login,
-                Password = EncodePassword(teacher.Password),
+                Password = Credentials.EncodePassword(teacher.Password),
                 Role = teacher.Role,
                 Group = null,
                 TeacherProfile = t
@@ -64,7 +62,7 @@ namespace Schedule.Services
             await Register(new User
             {
                 Login = staff.Login,
-                Password = EncodePassword(staff.Password),
+                Password = Credentials.EncodePassword(staff.Password),
                 Role = staff.Role,
                 Group = null,
                 TeacherProfile = null
@@ -115,7 +113,7 @@ namespace Schedule.Services
         }
         private async Task<User?> GetUserByCredentials(LoginCredentials credentials)
         {
-            var hashedPassword = EncodePassword(credentials.Password);
+            var hashedPassword = Credentials.EncodePassword(credentials.Password);
             return await _context.Users
                 .SingleOrDefaultAsync(u => u.Login == credentials.Login && u.Password == hashedPassword);
         }
@@ -150,10 +148,6 @@ namespace Schedule.Services
 
             return new ClaimsIdentity(claims, "Token");
         }
-        private string EncodePassword(string password) =>
-            Convert.ToHexString(
-                SHA256.Create().ComputeHash(new UTF8Encoding().GetBytes(password))
-                );
 
     }
 }
