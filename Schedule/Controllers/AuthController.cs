@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Schedule.Enums;
+using Schedule.Exceptions;
 using Schedule.Models.DTO;
 using Schedule.Services;
 using Schedule.Utils;
@@ -22,7 +23,7 @@ namespace Schedule.Controllers
         [RoleAuthorization(Role.ADMIN | Role.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
         public async Task<IActionResult> Register(RegistrationDTO user)
-        {
+        {   
             try
             {
                 var roleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
@@ -37,12 +38,12 @@ namespace Schedule.Controllers
                         {
                             if (sendByRole is not Role.ROOT)
                             {
-                                throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR);
+                                throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR, StatusCodes.Status403Forbidden);
                             }
                             await _authService.RegisterStaff(user);
                             break;
                         }
-                    case Role.ROOT: throw new BadHttpRequestException(ErrorStrings.ROOT_GIVEN_ERROR);
+                    case Role.ROOT: throw new BadHttpRequestException(ErrorStrings.ROOT_GIVEN_ERROR, StatusCodes.Status403Forbidden);
                     default: throw new BadHttpRequestException("", 500);
                 }
 
@@ -50,7 +51,7 @@ namespace Schedule.Controllers
             }
             catch (BadHttpRequestException e)
             {
-                return BadRequest(new { error = e.Message });
+                return StatusCode(e.StatusCode, new { error = e.Message });
             }
         }
 
@@ -63,7 +64,7 @@ namespace Schedule.Controllers
             }
             catch (BadHttpRequestException e)
             {
-                return BadRequest(new { error = e.Message });
+                return StatusCode(e.StatusCode, new { error = e.Message });
             }
         }
 
@@ -76,7 +77,7 @@ namespace Schedule.Controllers
             }
             catch (BadHttpRequestException e)
             {
-                return BadRequest(new { error = e.Message });
+                return StatusCode(e.StatusCode, new { error = e.Message });
             }
         }
 

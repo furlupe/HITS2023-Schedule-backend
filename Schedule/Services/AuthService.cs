@@ -4,9 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Schedule.Models;
 using Schedule.Utils;
 using Schedule.Enums;
-using Schedule.Models;
 using Schedule.Models.DTO;
-using Schedule.Utils;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -27,7 +25,7 @@ namespace Schedule.Services
             var group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == student.GroupNumber);
             if (group is null)
             {
-                throw new BadHttpRequestException(ErrorStrings.GROUP_WRONG_ID_ERROR);
+                throw new BadHttpRequestException(ErrorStrings.GROUP_WRONG_ID_ERROR, StatusCodes.Status404NotFound);
             }
 
             await Register(new User
@@ -44,12 +42,12 @@ namespace Schedule.Services
             var t = await _context.Teachers.SingleOrDefaultAsync(t => t.Id == teacher.TeacherID);
             if (t is null)
             {
-                throw new BadHttpRequestException(ErrorStrings.TEACHER_WRONG_ID_ERROR);
+                throw new BadHttpRequestException(ErrorStrings.TEACHER_WRONG_ID_ERROR, StatusCodes.Status404NotFound);
             }
 
             if (await _context.Users.AnyAsync(u => u.TeacherProfile == t))
             {
-                throw new BadHttpRequestException(ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR);
+                throw new BadHttpRequestException(ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR, StatusCodes.Status409Conflict);
             }
 
             await Register(new User
@@ -110,7 +108,7 @@ namespace Schedule.Services
         {
             if (await _context.Users.AnyAsync(u => u.Login == user.Login))
             {
-                throw new BadHttpRequestException(ErrorStrings.LOGIN_TAKEN_ERROR);
+                throw new BadHttpRequestException(ErrorStrings.LOGIN_TAKEN_ERROR, StatusCodes.Status409Conflict);
             }
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
