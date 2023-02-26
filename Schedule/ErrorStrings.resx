@@ -144,6 +144,9 @@
   <data name="STUDENT_TEACHER_GIVEN_ERROR" xml:space="preserve">
     <value>Student given, yet teacher id was provided</value>
   </data>
+  <data name="ROOT_GIVEN_ERROR" xml:space="preserve">
+    <value>Access denied</value>
+  </data>
   <data name="TEACHER_ACCOUNT_EXISTS_ERROR" xml:space="preserve">
     <value>There's already an account for teacher w/ such id</value>
   </data>

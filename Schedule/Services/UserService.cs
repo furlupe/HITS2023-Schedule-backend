@@ -66,7 +66,8 @@ namespace Schedule.Services
             if (group is null)
             {
                 throw new BadHttpRequestException(
-                    string.Format(ErrorStrings.GROUP_WRONG_NUMBER_ERROR, data.Group)
+                    string.Format(ErrorStrings.GROUP_WRONG_NUMBER_ERROR, data.Group),
+                    StatusCodes.Status404NotFound
                     );
             }
 
@@ -83,14 +84,16 @@ namespace Schedule.Services
             if (t is null)
             {
                 throw new BadHttpRequestException(
-                    string.Format(ErrorStrings.TEACHER_WRONG_ID_ERROR, data.TeacherId)
+                    string.Format(ErrorStrings.TEACHER_WRONG_ID_ERROR, data.TeacherId),
+                    StatusCodes.Status404NotFound
                     );
             }
 
             if (await _context.Users.AnyAsync(u => u.TeacherProfile == t))
             {
                 throw new BadHttpRequestException(
-                    string.Format(ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR, t.Id)
+                    string.Format(ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR, t.Id),
+                    StatusCodes.Status409Conflict
                     );
             }
 
@@ -129,7 +132,10 @@ namespace Schedule.Services
 
             if (user is null)
             {
-                throw new BadHttpRequestException(string.Format(ErrorStrings.USER_WRONG_ID_ERROR, id));
+                throw new BadHttpRequestException(
+                    string.Format(ErrorStrings.USER_WRONG_ID_ERROR, id),
+                    StatusCodes.Status404NotFound
+                    );
             }
 
             return user;

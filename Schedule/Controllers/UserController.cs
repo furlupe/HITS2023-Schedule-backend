@@ -48,7 +48,7 @@ namespace Schedule.Controllers
             }
             catch (BadHttpRequestException e)
             {
-                return BadRequest(new { error = e.Message });
+                return StatusCode(e.StatusCode, new { error = e.Message });
             }
         }
 
@@ -71,27 +71,19 @@ namespace Schedule.Controllers
                         {
                             if (sendByRole is not Role.ROOT)
                             {
-                                throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR);
+                                throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR, StatusCodes.Status403Forbidden);
                             }
                             await _userService.UpdateToStaff(id, data); break;
                         }
-                    case Role.ROOT: throw new ForbiddenException();
-                    default: throw new BadHttpRequestException("", 500);
+                    case Role.ROOT: throw new BadHttpRequestException(ErrorStrings.ROOT_GIVEN_ERROR, StatusCodes.Status403Forbidden);
+                    default: throw new BadHttpRequestException("", StatusCodes.Status500InternalServerError);
                 }
 
                 return Ok();
             }
             catch (BadHttpRequestException e)
             {
-                return BadRequest(new { error = e.Message });
-            }
-            catch (ForbiddenException)
-            {
-                return StatusCode(StatusCodes.Status403Forbidden);
-            }
-            catch (InternalServerException)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
+                return StatusCode(e.StatusCode, new { error = e.Message});
             }
         }
 
@@ -107,7 +99,7 @@ namespace Schedule.Controllers
             }
             catch (BadHttpRequestException e)
             {
-                return BadRequest(new { error = e.Message });
+                return StatusCode(e.StatusCode, new { error = e.Message });
             }
         }
     }
