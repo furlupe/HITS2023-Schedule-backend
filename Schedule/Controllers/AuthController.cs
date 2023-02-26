@@ -51,7 +51,7 @@ namespace Schedule.Controllers
             }
             catch (BadHttpRequestException e)
             {
-                return BadRequest(new { error = e.Message });
+                return StatusCode(e.StatusCode, new { error = e.Message });
             }
         }
 
@@ -64,7 +64,7 @@ namespace Schedule.Controllers
             }
             catch (BadHttpRequestException e)
             {
-                return BadRequest(new { error = e.Message });
+                return StatusCode(e.StatusCode, new { error = e.Message });
             }
         }
 
@@ -77,7 +77,7 @@ namespace Schedule.Controllers
             }
             catch (BadHttpRequestException e)
             {
-                return BadRequest(new { error = e.Message });
+                return StatusCode(e.StatusCode, new { error = e.Message });
             }
         }
 
