@@ -2,9 +2,9 @@
 {
     public class LessonDTO
     {
-        public string Name { get; set; }
-        public string Cabinet { get; set; }
-        public List<int> Group { get; set; }
+        public string Subject { get; set; }
+        public CabinetDTO Cabinet { get; set; }
+        public List<int> GroupsNum { get; set; }
         public string Teacher { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
