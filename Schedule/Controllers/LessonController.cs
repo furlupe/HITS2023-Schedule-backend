@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Schedule.Enums;
 using Schedule.Models.DTO;
 using Schedule.Services;
+using Schedule.Utils;
 
 namespace Schedule.Controllers
 {
@@ -16,21 +18,26 @@ namespace Schedule.Controllers
             _lessonService = lessonService;
         }
         [HttpPost]
+        [RoleAuthorization(Role.EDITOR)]
         public async Task<IActionResult> CreateLesson(LessonCreateDTO lesson)
         {
-            _lessonService.CreateLesson(lesson);
+            await _lessonService.CreateLesson(lesson);
             return Ok();
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateLesson()
+        [RoleAuthorization(Role.EDITOR)]
+        public async Task<IActionResult> UpdateLesson(LessonCreateDTO lesson, [BindRequired] Guid id)
         {
+            await _lessonService.EditLesson(lesson, id);
             return Ok();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult RemoveLesson([BindRequired] Guid id)
+        [RoleAuthorization(Role.EDITOR)]
+        public async Task<IActionResult> RemoveLesson([BindRequired] Guid id)
         {
+            await _lessonService.DeleteLesson(id);
             return Ok();
         }
     }

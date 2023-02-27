@@ -11,7 +11,7 @@ namespace Schedule.Models.DTO
         [Required]
         public List<int> GroupsNum { get; set; }
         [Required]
-        public int ClassroomNum { get; set; }
+        public int CabinetNum { get; set; }
         [Required]
         public Guid TimeslotId { get; set; }
         [Required]
