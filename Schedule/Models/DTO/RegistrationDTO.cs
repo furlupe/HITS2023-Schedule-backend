@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Schedule.Models.DTO
 {
-    public class RegistrationDTO
+    public class RegistrationDto
     {
         [Required]
         public string Login { get; set; }

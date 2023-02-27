@@ -40,7 +40,14 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-var connection = builder.Configuration.GetConnectionString("DefaultConnection");
+var connection = string.Format(
+    builder.Configuration.GetConnectionString("DefaultConnection"),
+    Environment.GetEnvironmentVariable("DB_HOST"),
+    Environment.GetEnvironmentVariable("DB_PORT"),
+    Environment.GetEnvironmentVariable("DB_NAME"),
+    Environment.GetEnvironmentVariable("DB_USER"),
+    Environment.GetEnvironmentVariable("DB_PASSWORD"));
+
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(connection));
 
 builder.Services.AddHttpContextAccessor();

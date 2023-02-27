@@ -1,0 +1,33 @@
+﻿version: '3.4'
+
+networks:
+  mynetwork:
+
+services:
+  schedule:
+    image: furlupe/schedule_test:1.1
+    environment:
+      - ASPNETCORE_HTTP_PORT=https://+:5000
+      - ASDPNETCORE_URLS=http://+:5000
+      - DB_HOST=database
+      - DB_PORT=5432
+      - DB_NAME=ScheduleDB
+      - DB_USER=postgres
+      - DB_PASSWORD=1234
+    depends_on: 
+      - database
+    ports:
+      - "5000:80"
+    networks:
+      - mynetwork
+
+  database:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+      - POSTGRES_DB=ScheduleDB
+    ports:
+      - "5433:5432"
+    networks:
+      - mynetwork

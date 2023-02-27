@@ -1,6 +1,4 @@
-﻿using Schedule.Services;
-
-namespace Schedule.Models.DTO
+﻿namespace Schedule.Models.DTO
 {
     public class ClassroomListDTO
     {

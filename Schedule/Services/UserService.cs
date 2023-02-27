@@ -62,7 +62,7 @@ namespace Schedule.Services
                 Group = (user.Group is null) ? null : user.Group.Number
             };
         }
-        public async Task UpdateToStudent(Guid id, UserShortInfoDto data)
+        public async Task UpdateToStudent(Guid id, UserShortInfoDto data) 
         {
             var group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == data.Group);
             if (group is null)

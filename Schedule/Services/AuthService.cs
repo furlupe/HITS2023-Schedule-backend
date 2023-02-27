@@ -18,12 +18,14 @@ namespace Schedule.Services
             _context = context;
         }
 
-        public async Task RegisterStudent(RegistrationDTO student)
+        public async Task RegisterStudent(RegistrationDto student)
         {
             var group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == student.GroupNumber);
             if (group is null)
             {
-                throw new BadHttpRequestException(ErrorStrings.GROUP_WRONG_ID_ERROR, StatusCodes.Status404NotFound);
+                throw new BadHttpRequestException(
+                    ErrorStrings.GROUP_WRONG_ID_ERROR, 
+                    StatusCodes.Status404NotFound);
             }
 
             await Register(new User
@@ -35,17 +37,21 @@ namespace Schedule.Services
                 TeacherProfile = null
             });
         }
-        public async Task RegisterTeacher(RegistrationDTO teacher)
+        public async Task RegisterTeacher(RegistrationDto teacher)
         {
             var t = await _context.Teachers.SingleOrDefaultAsync(t => t.Id == teacher.TeacherID);
             if (t is null)
             {
-                throw new BadHttpRequestException(ErrorStrings.TEACHER_WRONG_ID_ERROR, StatusCodes.Status404NotFound);
+                throw new BadHttpRequestException(
+                    ErrorStrings.TEACHER_WRONG_ID_ERROR, 
+                    StatusCodes.Status404NotFound);
             }
 
             if (await _context.Users.AnyAsync(u => u.TeacherProfile == t))
             {
-                throw new BadHttpRequestException(ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR, StatusCodes.Status409Conflict);
+                throw new BadHttpRequestException(
+                    ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR, 
+                    StatusCodes.Status409Conflict);
             }
 
             await Register(new User
@@ -57,7 +63,7 @@ namespace Schedule.Services
                 TeacherProfile = t
             });
         }
-        public async Task RegisterStaff(RegistrationDTO staff)
+        public async Task RegisterStaff(RegistrationDto staff)
         {
             await Register(new User
             {
@@ -106,7 +112,9 @@ namespace Schedule.Services
         {
             if (await _context.Users.AnyAsync(u => u.Login == user.Login))
             {
-                throw new BadHttpRequestException(ErrorStrings.LOGIN_TAKEN_ERROR, StatusCodes.Status409Conflict);
+                throw new BadHttpRequestException(
+                    ErrorStrings.LOGIN_TAKEN_ERROR, 
+                    StatusCodes.Status409Conflict);
             }
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();

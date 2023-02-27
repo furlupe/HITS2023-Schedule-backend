@@ -21,7 +21,7 @@ namespace Schedule.Controllers
         [HttpPost("register")]
         [RoleAuthorization(Role.ADMIN | Role.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
-        public async Task<IActionResult> Register(RegistrationDTO user)
+        public async Task<IActionResult> Register(RegistrationDto user)
         {
             try
             {
