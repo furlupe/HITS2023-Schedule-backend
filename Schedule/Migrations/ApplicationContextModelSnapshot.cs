@@ -22,8 +22,6 @@ namespace Schedule.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-<<<<<<< HEAD
-=======
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.Property<Guid>("RolesId")
@@ -39,7 +37,6 @@ namespace Schedule.Migrations
                     b.ToTable("RoleUser");
                 });
 
->>>>>>> feature/17042
             modelBuilder.Entity("Schedule.Models.BlacklistedToken", b =>
                 {
                     b.Property<int>("Id")
@@ -98,7 +95,7 @@ namespace Schedule.Migrations
                         },
                         new
                         {
-                            Number = 972201
+                            Number = 972203
                         });
                 });
 
@@ -152,27 +149,27 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("cbc8d2b5-87ce-4b58-b984-f3d1a29d0f44"),
+                            Id = new Guid("858da450-7c6a-4cfe-b3d2-611691734d9d"),
                             Value = 0
                         },
                         new
                         {
-                            Id = new Guid("d8bc384e-7d88-4ecd-a6d6-82da257809fd"),
+                            Id = new Guid("e2a90f83-4ec2-4919-a916-75d089937f0a"),
                             Value = 1
                         },
                         new
                         {
-                            Id = new Guid("7737596e-eb3d-43da-b208-50bf6c747b54"),
+                            Id = new Guid("e50e33c0-669d-4d27-9d79-6329171a5a9c"),
                             Value = 2
                         },
                         new
                         {
-                            Id = new Guid("74833abe-99c9-48be-98ec-2679aee278bd"),
+                            Id = new Guid("3fd65f2c-e118-47da-907b-cef233c5083f"),
                             Value = 3
                         },
                         new
                         {
-                            Id = new Guid("065a2929-e8b6-41c1-a83b-8249b54160c5"),
+                            Id = new Guid("68f7bdb8-7d62-4ff5-be08-548dd637aec9"),
                             Value = 4
                         });
                 });
@@ -194,7 +191,7 @@ namespace Schedule.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("Subject");
+                    b.ToTable("Subjects");
                 });
 
             modelBuilder.Entity("Schedule.Models.Teacher", b =>
@@ -256,15 +253,21 @@ namespace Schedule.Migrations
                     b.HasIndex("TeacherProfileId");
 
                     b.ToTable("Users");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("c1fca986-3b9b-467c-8a93-f3e972300573"),
-                            Login = "furlupe",
-                            Password = "3414A9BE42AE5049DD6DBEE1E2C70A986C2E5C20B6E7BF3DDA103678FDDAA7DB",
-                            Role = 4
-                        });
+            modelBuilder.Entity("RoleUser", b =>
+                {
+                    b.HasOne("Schedule.Models.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RolesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Schedule.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Schedule.Models.Group", b =>
@@ -307,21 +310,6 @@ namespace Schedule.Migrations
                     b.Navigation("Teacher");
 
                     b.Navigation("Timeslot");
-                });
-
-            modelBuilder.Entity("RoleUser", b =>
-                {
-                    b.HasOne("Schedule.Models.Role", null)
-                        .WithMany()
-                        .HasForeignKey("RolesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Schedule.Models.User", null)
-                        .WithMany()
-                        .HasForeignKey("UsersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Schedule.Models.Subject", b =>

@@ -54,7 +54,7 @@ namespace Schedule.Controllers
         }
 
         [HttpPut("{id}")]
-        [RoleAuthorization(RoleEnum.ADMIN)]
+        [RoleAuthorization(RoleEnum.ADMIN | RoleEnum.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
         public async Task<IActionResult> UpdateUser([BindRequired] Guid id, UserShortInfoDto data)
         {
@@ -91,7 +91,7 @@ namespace Schedule.Controllers
 
             try
             {
-                await _userService.DeleteUser(id);
+                await _userService.DeleteUser(id, senderRoles);
                 return Ok();
             }
             catch (BadHttpRequestException e)

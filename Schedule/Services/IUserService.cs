@@ -8,6 +8,6 @@ namespace Schedule.Services
         Task<ICollection<UserInfoDto>> GetUsers(ICollection<RoleEnum> roles);
         Task<UserInfoDto> GetUser(Guid id);
         Task UpdateUser(Guid id, UserShortInfoDto data);
-        Task DeleteUser(Guid id);
+        Task DeleteUser(Guid id, IEnumerable<RoleEnum> senderRoles);
     }
 }

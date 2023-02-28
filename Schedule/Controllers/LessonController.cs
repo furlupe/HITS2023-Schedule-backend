@@ -18,7 +18,7 @@ namespace Schedule.Controllers
             _lessonService = lessonService;
         }
         [HttpPost]
-        [RoleAuthorization(Role.EDITOR)]
+        [RoleAuthorization(RoleEnum.EDITOR)]
         public async Task<IActionResult> CreateLesson(LessonCreateDTO lesson)
         {
             await _lessonService.CreateLesson(lesson);
@@ -26,7 +26,7 @@ namespace Schedule.Controllers
         }
 
         [HttpPut("{id}")]
-        [RoleAuthorization(Role.EDITOR)]
+        [RoleAuthorization(RoleEnum.EDITOR)]
         public async Task<IActionResult> UpdateLesson(LessonCreateDTO lesson, [BindRequired] Guid id)
         {
             await _lessonService.EditLesson(lesson, id);
@@ -34,7 +34,7 @@ namespace Schedule.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RoleAuthorization(Role.EDITOR)]
+        [RoleAuthorization(RoleEnum.EDITOR)]
         public async Task<IActionResult> RemoveLesson([BindRequired] Guid id)
         {
             await _lessonService.DeleteLesson(id);

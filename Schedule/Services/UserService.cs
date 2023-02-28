@@ -13,10 +13,16 @@ namespace Schedule.Services
         {
             _context = context;
         }
-        public async Task DeleteUser(Guid id)
+        public async Task DeleteUser(Guid id, IEnumerable<RoleEnum> senderRoles)
         {
+            var user = await AccessUser(id);
+            if (user.Roles.Any(r => r.Value == RoleEnum.ROOT) ||
+                user.Roles.Any(r => r.Value == RoleEnum.ADMIN) && !senderRoles.Any(r => r == RoleEnum.ROOT))
+            {
+                throw new BadHttpRequestException(ErrorStrings.ACCESS_DENIED);
+            }
 
-            _context.Users.Remove(await AccessUser(id));
+            _context.Users.Remove(user);
             await _context.SaveChangesAsync();
         }
         public async Task<ICollection<UserInfoDto>> GetUsers(ICollection<RoleEnum> roles)
@@ -95,6 +101,10 @@ namespace Schedule.Services
             }
 
             var user = await AccessUser(id);
+            if (user.Roles.Any(r => r.Value == RoleEnum.ROOT))
+            {
+                throw new BadHttpRequestException(ErrorStrings.ACCESS_DENIED);
+            }
 
             user.Roles = await _context.Roles.Where(r => data.Roles.Contains(r.Value)).ToListAsync();
             user.Group = group;
@@ -104,16 +114,12 @@ namespace Schedule.Services
         }
         private async Task<User> AccessUser(Guid id)
         {
+
             var user = await _context.Users
                 .Include(u => u.TeacherProfile)
                 .Include(u => u.Group)
                 .Include(u => u.Roles)
                 .SingleOrDefaultAsync(u => u.Id == id);
-
-            if (user.Roles.Any(r => r.Value == RoleEnum.ROOT))
-            {
-                throw new BadHttpRequestException(ErrorStrings.ACCESS_DENIED);
-            }
 
             if (user is null)
             {

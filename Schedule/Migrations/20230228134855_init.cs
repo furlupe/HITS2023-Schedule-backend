@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Schedule.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -78,7 +78,7 @@ namespace Schedule.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Subject",
+                name: "Subjects",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -87,9 +87,9 @@ namespace Schedule.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Subject", x => x.Id);
+                    table.PrimaryKey("PK_Subjects", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Subject_Teachers_TeacherId",
+                        name: "FK_Subjects_Teachers_TeacherId",
                         column: x => x.TeacherId,
                         principalTable: "Teachers",
                         principalColumn: "Id");
@@ -116,9 +116,9 @@ namespace Schedule.Migrations
                         principalColumn: "Number",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Lessons_Subject_SubjectId",
+                        name: "FK_Lessons_Subjects_SubjectId",
                         column: x => x.SubjectId,
-                        principalTable: "Subject",
+                        principalTable: "Subjects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -140,7 +140,7 @@ namespace Schedule.Migrations
                 columns: table => new
                 {
                     Number = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                 },
                 constraints: table =>
                 {
@@ -172,15 +172,6 @@ namespace Schedule.Migrations
                         principalColumn: "Id");
                 });
 
-<<<<<<<< HEAD:Schedule/Migrations/20230226082721_init.cs
-            migrationBuilder.InsertData(
-                table: "Groups",
-                columns: new[] { "Number" },
-                values: new object[,]
-                {
-                    { 972103 },
-                    { 972201 }
-========
             migrationBuilder.CreateTable(
                 name: "RoleUser",
                 columns: table => new
@@ -206,23 +197,25 @@ namespace Schedule.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Groups",
+                columns: new[] { "Number", "LessonId" },
+                values: new object[,]
+                {
+                    { 972103, null },
+                    { 972203, null }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Roles",
                 columns: new[] { "Id", "Value" },
                 values: new object[,]
                 {
-                    { new Guid("44197e43-4a9b-4e2a-a5c3-3c1775881099"), 0 },
-                    { new Guid("475c6e59-95f9-4536-ae57-89a9fd14538c"), 1 },
-                    { new Guid("9a452db5-3f6e-4a05-a8ae-2dbd265d7c19"), 2 },
-                    { new Guid("c0c3754f-be95-4ac8-9d62-90136753769f"), 4 },
-                    { new Guid("d08fe43a-6efb-4948-8893-1930f59b3346"), 3 }
->>>>>>>> feature/17042:Schedule/Migrations/20230228105348_Initial.cs
+                    { new Guid("3fd65f2c-e118-47da-907b-cef233c5083f"), 3 },
+                    { new Guid("68f7bdb8-7d62-4ff5-be08-548dd637aec9"), 4 },
+                    { new Guid("858da450-7c6a-4cfe-b3d2-611691734d9d"), 0 },
+                    { new Guid("e2a90f83-4ec2-4919-a916-75d089937f0a"), 1 },
+                    { new Guid("e50e33c0-669d-4d27-9d79-6329171a5a9c"), 2 }
                 });
-
-            migrationBuilder.InsertData(
-                table: "Users",
-<<<<<<<< HEAD:Schedule/Migrations/20230226082721_init.cs
-                columns: new[] { "Id", "GroupNumber", "Login", "Password", "Role", "TeacherProfileId" },
-                values: new object[] { new Guid("c1fca986-3b9b-467c-8a93-f3e972300573"), null, "furlupe", "3414A9BE42AE5049DD6DBEE1E2C70A986C2E5C20B6E7BF3DDA103678FDDAA7DB", 4, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Lessons_CabinetNumber",
@@ -243,19 +236,15 @@ namespace Schedule.Migrations
                 name: "IX_Lessons_TimeslotId",
                 table: "Lessons",
                 column: "TimeslotId");
-========
-                columns: new[] { "Id", "GroupNumber", "Login", "Password", "TeacherProfileId" },
-                values: new object[] { new Guid("001caa83-b15a-44dd-9e74-bc54550957ff"), null, "furlupe", "3414A9BE42AE5049DD6DBEE1E2C70A986C2E5C20B6E7BF3DDA103678FDDAA7DB", null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoleUser_UsersId",
                 table: "RoleUser",
                 column: "UsersId");
->>>>>>>> feature/17042:Schedule/Migrations/20230228105348_Initial.cs
 
             migrationBuilder.CreateIndex(
-                name: "IX_Subject_TeacherId",
-                table: "Subject",
+                name: "IX_Subjects_TeacherId",
+                table: "Subjects",
                 column: "TeacherId");
 
             migrationBuilder.CreateIndex(
@@ -276,18 +265,12 @@ namespace Schedule.Migrations
                 name: "Blacklist");
 
             migrationBuilder.DropTable(
-<<<<<<<< HEAD:Schedule/Migrations/20230226082721_init.cs
-========
                 name: "RoleUser");
-
-            migrationBuilder.DropTable(
-                name: "Subject");
 
             migrationBuilder.DropTable(
                 name: "Roles");
 
             migrationBuilder.DropTable(
->>>>>>>> feature/17042:Schedule/Migrations/20230228105348_Initial.cs
                 name: "Users");
 
             migrationBuilder.DropTable(
@@ -300,7 +283,7 @@ namespace Schedule.Migrations
                 name: "Cabinets");
 
             migrationBuilder.DropTable(
-                name: "Subject");
+                name: "Subjects");
 
             migrationBuilder.DropTable(
                 name: "Timeslots");
