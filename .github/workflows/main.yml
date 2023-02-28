@@ -1,0 +1,36 @@
+name: "Backend deployment"
+on:
+  push:
+    branches: ["deploy"]
+  pull_request:
+    branches: ["deploy"]
+
+jobs:
+  set_repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v3
+      - name: "Set up the repository" 
+        run: |
+            sudo apt-get remove docker docker-engine docker.io containerd runc
+            sudo apt-get purge docker-ce docker-ce-cli containerd.io
+            sudo apt-get install \
+            ca-certificates \
+            curl \
+            gnupg \
+            lsb-release
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+            echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+            $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+            apt update
+            sudo apt-get install docker-ce docker-ce-cli containerd.io
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v3
+      - name: "Build docker image"
+        run: ls -la
+          
