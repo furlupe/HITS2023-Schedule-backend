@@ -15,23 +15,27 @@ namespace Schedule.Services
         }
         public async Task DeleteUser(Guid id)
         {
+
             _context.Users.Remove(await AccessUser(id));
             await _context.SaveChangesAsync();
         }
-        public async Task<ICollection<UserInfoDto>> GetUsers(ICollection<Role> roles)
+        public async Task<ICollection<UserInfoDto>> GetUsers(ICollection<RoleEnum> roles)
         {
-            var selectedUsers = new List<User>();
+            var selectedUsers = await _context.Users
+                    .Include(u => u.Roles)
+                    .Include(u => u.TeacherProfile)
+                    .Include(u => u.Group)
+                    .ToListAsync();
+
             if (roles.Count > 0)
             {
-                selectedUsers = await _context.Users
-                    .Include(u => u.Group)
-                    .Include(u => u.TeacherProfile)
-                    .Where(u => roles.Contains(u.Role))
-                    .ToListAsync();
-            }
-            else
-            {
-                selectedUsers = await _context.Users.ToListAsync();
+                selectedUsers = selectedUsers.Where(
+                    u => u.Roles
+                        .Select(r => r.Value)
+                        .Intersect(roles)
+                        .Any()
+                    )
+                    .ToList();
             }
 
             var users = new List<UserInfoDto>();
@@ -41,7 +45,7 @@ namespace Schedule.Services
                 {
                     Id = user.Id,
                     Login = user.Login,
-                    Role = user.Role,
+                    Roles = user.Roles.Select(r => r.Value).ToList(),
                     TeacherId = user.TeacherProfile is null ? null : user.TeacherProfile.Id,
                     Group = user.Group is null ? null : user.Group.Number
                 });
@@ -57,15 +61,16 @@ namespace Schedule.Services
             {
                 Id = user.Id,
                 Login = user.Login,
-                Role = user.Role,
+                Roles = user.Roles.Select(r => r.Value).ToList(),
                 TeacherId = (user.TeacherProfile is null) ? null : user.TeacherProfile.Id,
                 Group = (user.Group is null) ? null : user.Group.Number
             };
         }
-        public async Task UpdateToStudent(Guid id, UserShortInfoDto data)
+
+        public async Task UpdateUser(Guid id, UserShortInfoDto data)
         {
             var group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == data.Group);
-            if (group is null)
+            if (group is null && data.Roles.Contains(RoleEnum.STUDENT))
             {
                 throw new BadHttpRequestException(
                     string.Format(ErrorStrings.GROUP_WRONG_NUMBER_ERROR, data.Group),
@@ -73,17 +78,8 @@ namespace Schedule.Services
                     );
             }
 
-            await UpdateUser(id, new UserUpdateObject
-            {
-                Role = data.Role,
-                Teacher = null,
-                Group = group
-            });
-        }
-        public async Task UpdateToTeacher(Guid id, UserShortInfoDto data)
-        {
-            var t = await _context.Teachers.SingleOrDefaultAsync(t => t.Id == data.TeacherId);
-            if (t is null)
+            var teacher = await _context.Teachers.SingleOrDefaultAsync(t => t.Id == data.TeacherId);
+            if (teacher is null && data.Roles.Contains(RoleEnum.TEACHER))
             {
                 throw new BadHttpRequestException(
                     string.Format(ErrorStrings.TEACHER_WRONG_ID_ERROR, data.TeacherId),
@@ -91,37 +87,18 @@ namespace Schedule.Services
                     );
             }
 
-            if (await _context.Users.AnyAsync(u => u.TeacherProfile == t))
+            if (teacher is not null && await _context.Users.AnyAsync(u => u.TeacherProfile == teacher))
             {
                 throw new BadHttpRequestException(
-                    string.Format(ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR, t.Id),
-                    StatusCodes.Status409Conflict
-                    );
+                    string.Format(ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR, teacher.Id),
+                    StatusCodes.Status409Conflict);
             }
 
-            await UpdateUser(id, new UserUpdateObject
-            {
-                Role = data.Role,
-                Teacher = t,
-                Group = null
-            });
-        }
-        public async Task UpdateToStaff(Guid id, UserShortInfoDto data)
-        {
-            await UpdateUser(id, new UserUpdateObject
-            {
-                Role = data.Role,
-                Teacher = null,
-                Group = null
-            });
-        }
-        private async Task UpdateUser(Guid id, UserUpdateObject data)
-        {
             var user = await AccessUser(id);
 
-            user.Role = data.Role;
-            user.Group = data.Group;
-            user.TeacherProfile = data.Teacher;
+            user.Roles = await _context.Roles.Where(r => data.Roles.Contains(r.Value)).ToListAsync();
+            user.Group = group;
+            user.TeacherProfile = teacher;
 
             await _context.SaveChangesAsync();
         }
@@ -130,7 +107,13 @@ namespace Schedule.Services
             var user = await _context.Users
                 .Include(u => u.TeacherProfile)
                 .Include(u => u.Group)
+                .Include(u => u.Roles)
                 .SingleOrDefaultAsync(u => u.Id == id);
+
+            if (user.Roles.Any(r => r.Value == RoleEnum.ROOT))
+            {
+                throw new BadHttpRequestException(ErrorStrings.ACCESS_DENIED);
+            }
 
             if (user is null)
             {
