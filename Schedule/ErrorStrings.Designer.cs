@@ -70,6 +70,15 @@ namespace Schedule {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Access denied.
+        /// </summary>
+        public static string ACCESS_DENIED_ERROR {
+            get {
+                return ResourceManager.GetString("ACCESS_DENIED_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Group w/ number = {0} does not exist.
         /// </summary>
         public static string GROUP_WRONG_NUMBER_ERROR {
@@ -84,15 +93,6 @@ namespace Schedule {
         public static string NOT_A_ROOT_ERROR {
             get {
                 return ResourceManager.GetString("NOT_A_ROOT_ERROR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Access denied.
-        /// </summary>
-        public static string ROOT_GIVEN_ERROR {
-            get {
-                return ResourceManager.GetString("ROOT_GIVEN_ERROR", resourceCulture);
             }
         }
         

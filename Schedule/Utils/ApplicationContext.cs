@@ -9,6 +9,7 @@ namespace Schedule.Utils
         public DbSet<BlacklistedToken> Blacklist { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Teacher> Teachers { get; set; }
+        public DbSet<Role> Roles { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
             Database.EnsureCreated();
