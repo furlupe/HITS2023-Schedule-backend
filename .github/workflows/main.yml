@@ -1,9 +1,9 @@
 name: "Backend deployment"
 on:
   push:
-    branches: ["deploy"]
+    branches: ["master"]
   pull_request:
-    branches: ["deploy"]
+    branches: ["master"]
 
 jobs:
   set_repo:
