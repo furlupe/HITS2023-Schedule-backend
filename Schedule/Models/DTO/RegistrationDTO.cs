@@ -10,7 +10,7 @@ namespace Schedule.Models.DTO
         [Required]
         public string Password { get; set; }
         [Required]
-        public Role Role { get; set; }
+        public ICollection<RoleEnum> Roles { get; set; }
 
         public Guid? TeacherID { get; set; }
         public int? GroupNumber { get; set; }

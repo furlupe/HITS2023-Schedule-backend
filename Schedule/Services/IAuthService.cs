@@ -5,9 +5,7 @@ namespace Schedule.Services
 {
     public interface IAuthService
     {
-        Task RegisterStudent(RegistrationDTO user);
-        Task RegisterTeacher(RegistrationDTO user);
-        Task RegisterStaff(RegistrationDTO user);
+        Task Register(RegistrationDTO user);
 
         Task<JsonResult> MobileLogin(LoginCredentials user);
         Task<JsonResult> WebLogin(LoginCredentials user);

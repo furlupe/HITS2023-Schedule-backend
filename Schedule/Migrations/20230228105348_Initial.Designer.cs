@@ -12,8 +12,8 @@ using Schedule.Utils;
 namespace Schedule.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20230222064602_init")]
-    partial class init
+    [Migration("20230228105348_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,22 @@ namespace Schedule.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("MoviesCatalog.Models.BlacklistedToken", b =>
+            modelBuilder.Entity("RoleUser", b =>
+                {
+                    b.Property<Guid>("RolesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UsersId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("RolesId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("RoleUser");
+                });
+
+            modelBuilder.Entity("Schedule.Models.BlacklistedToken", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -53,6 +68,47 @@ namespace Schedule.Migrations
                     b.HasKey("Number");
 
                     b.ToTable("Groups");
+                });
+
+            modelBuilder.Entity("Schedule.Models.Role", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Value")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("44197e43-4a9b-4e2a-a5c3-3c1775881099"),
+                            Value = 0
+                        },
+                        new
+                        {
+                            Id = new Guid("475c6e59-95f9-4536-ae57-89a9fd14538c"),
+                            Value = 1
+                        },
+                        new
+                        {
+                            Id = new Guid("9a452db5-3f6e-4a05-a8ae-2dbd265d7c19"),
+                            Value = 2
+                        },
+                        new
+                        {
+                            Id = new Guid("d08fe43a-6efb-4948-8893-1930f59b3346"),
+                            Value = 3
+                        },
+                        new
+                        {
+                            Id = new Guid("c0c3754f-be95-4ac8-9d62-90136753769f"),
+                            Value = 4
+                        });
                 });
 
             modelBuilder.Entity("Schedule.Models.Subject", b =>
@@ -107,9 +163,6 @@ namespace Schedule.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Role")
-                        .HasColumnType("integer");
-
                     b.Property<Guid?>("TeacherProfileId")
                         .HasColumnType("uuid");
 
@@ -120,6 +173,29 @@ namespace Schedule.Migrations
                     b.HasIndex("TeacherProfileId");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("001caa83-b15a-44dd-9e74-bc54550957ff"),
+                            Login = "furlupe",
+                            Password = "3414A9BE42AE5049DD6DBEE1E2C70A986C2E5C20B6E7BF3DDA103678FDDAA7DB"
+                        });
+                });
+
+            modelBuilder.Entity("RoleUser", b =>
+                {
+                    b.HasOne("Schedule.Models.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RolesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Schedule.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Schedule.Models.Subject", b =>

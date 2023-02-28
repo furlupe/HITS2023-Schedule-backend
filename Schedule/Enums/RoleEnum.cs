@@ -1,7 +1,7 @@
 ﻿namespace Schedule.Enums
 {
     [Flags]
-    public enum Role
+    public enum RoleEnum
     {
         STUDENT = 0,
         TEACHER = 1,

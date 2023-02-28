@@ -79,7 +79,7 @@ namespace Schedule {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Group w/ such id does not exist.
+        ///   Looks up a localized string similar to Group w/ id = {0} does not exist.
         /// </summary>
         public static string GROUP_WRONG_ID_ERROR {
             get {
@@ -142,7 +142,7 @@ namespace Schedule {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There&apos;s already an account for teacher w/ such id.
+        ///   Looks up a localized string similar to There&apos;s already an account for teacher w/ id = {0}.
         /// </summary>
         public static string TEACHER_ACCOUNT_EXISTS_ERROR {
             get {
@@ -169,7 +169,7 @@ namespace Schedule {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Teacher w/ such id does not exist.
+        ///   Looks up a localized string similar to Teacher w/ id = {0} does not exist.
         /// </summary>
         public static string TEACHER_WRONG_ID_ERROR {
             get {
