@@ -124,7 +124,7 @@
     <value>Editor\\admin given, yet teacher id was provided</value>
   </data>
   <data name="GROUP_WRONG_ID_ERROR" xml:space="preserve">
-    <value>Group w/ such id does not exist</value>
+    <value>Group w/ id = {0} does not exist</value>
   </data>
   <data name="INVALID_CREDENTIALS_ERROR" xml:space="preserve">
     <value>Invalid credentials</value>
@@ -148,7 +148,7 @@
     <value>Access denied</value>
   </data>
   <data name="TEACHER_ACCOUNT_EXISTS_ERROR" xml:space="preserve">
-    <value>There's already an account for teacher w/ such id</value>
+    <value>There's already an account for teacher w/ id = {0}</value>
   </data>
   <data name="TEACHER_GROUP_GIVEN_ERROR" xml:space="preserve">
     <value>Teacher given, yet group id was provided</value>

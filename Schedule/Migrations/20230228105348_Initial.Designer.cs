@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Schedule.Utils;
@@ -11,9 +12,11 @@ using Schedule.Utils;
 namespace Schedule.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20230228105348_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,8 +25,6 @@ namespace Schedule.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-<<<<<<< HEAD
-=======
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.Property<Guid>("RolesId")
@@ -39,7 +40,6 @@ namespace Schedule.Migrations
                     b.ToTable("RoleUser");
                 });
 
->>>>>>> feature/17042
             modelBuilder.Entity("Schedule.Models.BlacklistedToken", b =>
                 {
                     b.Property<int>("Id")
@@ -57,23 +57,6 @@ namespace Schedule.Migrations
                     b.ToTable("Blacklist");
                 });
 
-            modelBuilder.Entity("Schedule.Models.Cabinet", b =>
-                {
-                    b.Property<int>("Number")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Number"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Number");
-
-                    b.ToTable("Cabinets");
-                });
-
             modelBuilder.Entity("Schedule.Models.Group", b =>
                 {
                     b.Property<int>("Number")
@@ -82,58 +65,9 @@ namespace Schedule.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Number"));
 
-                    b.Property<Guid?>("LessonId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Number");
 
-                    b.HasIndex("LessonId");
-
                     b.ToTable("Groups");
-
-                    b.HasData(
-                        new
-                        {
-                            Number = 972103
-                        },
-                        new
-                        {
-                            Number = 972201
-                        });
-                });
-
-            modelBuilder.Entity("Schedule.Models.Lesson", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("CabinetNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("SubjectId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("TeacherId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("TimeslotId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CabinetNumber");
-
-                    b.HasIndex("SubjectId");
-
-                    b.HasIndex("TeacherId");
-
-                    b.HasIndex("TimeslotId");
-
-                    b.ToTable("Lessons");
                 });
 
             modelBuilder.Entity("Schedule.Models.Role", b =>
@@ -152,27 +86,27 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("cbc8d2b5-87ce-4b58-b984-f3d1a29d0f44"),
+                            Id = new Guid("44197e43-4a9b-4e2a-a5c3-3c1775881099"),
                             Value = 0
                         },
                         new
                         {
-                            Id = new Guid("d8bc384e-7d88-4ecd-a6d6-82da257809fd"),
+                            Id = new Guid("475c6e59-95f9-4536-ae57-89a9fd14538c"),
                             Value = 1
                         },
                         new
                         {
-                            Id = new Guid("7737596e-eb3d-43da-b208-50bf6c747b54"),
+                            Id = new Guid("9a452db5-3f6e-4a05-a8ae-2dbd265d7c19"),
                             Value = 2
                         },
                         new
                         {
-                            Id = new Guid("74833abe-99c9-48be-98ec-2679aee278bd"),
+                            Id = new Guid("d08fe43a-6efb-4948-8893-1930f59b3346"),
                             Value = 3
                         },
                         new
                         {
-                            Id = new Guid("065a2929-e8b6-41c1-a83b-8249b54160c5"),
+                            Id = new Guid("c0c3754f-be95-4ac8-9d62-90136753769f"),
                             Value = 4
                         });
                 });
@@ -212,23 +146,6 @@ namespace Schedule.Migrations
                     b.ToTable("Teachers");
                 });
 
-            modelBuilder.Entity("Schedule.Models.Timeslot", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("EndsAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("StartsAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Timeslots");
-                });
-
             modelBuilder.Entity("Schedule.Models.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -260,53 +177,10 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c1fca986-3b9b-467c-8a93-f3e972300573"),
+                            Id = new Guid("001caa83-b15a-44dd-9e74-bc54550957ff"),
                             Login = "furlupe",
-                            Password = "3414A9BE42AE5049DD6DBEE1E2C70A986C2E5C20B6E7BF3DDA103678FDDAA7DB",
-                            Role = 4
+                            Password = "3414A9BE42AE5049DD6DBEE1E2C70A986C2E5C20B6E7BF3DDA103678FDDAA7DB"
                         });
-                });
-
-            modelBuilder.Entity("Schedule.Models.Group", b =>
-                {
-                    b.HasOne("Schedule.Models.Lesson", null)
-                        .WithMany("Groups")
-                        .HasForeignKey("LessonId");
-                });
-
-            modelBuilder.Entity("Schedule.Models.Lesson", b =>
-                {
-                    b.HasOne("Schedule.Models.Cabinet", "Cabinet")
-                        .WithMany()
-                        .HasForeignKey("CabinetNumber")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Schedule.Models.Subject", "Subject")
-                        .WithMany()
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Schedule.Models.Teacher", "Teacher")
-                        .WithMany()
-                        .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Schedule.Models.Timeslot", "Timeslot")
-                        .WithMany()
-                        .HasForeignKey("TimeslotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cabinet");
-
-                    b.Navigation("Subject");
-
-                    b.Navigation("Teacher");
-
-                    b.Navigation("Timeslot");
                 });
 
             modelBuilder.Entity("RoleUser", b =>
@@ -349,11 +223,6 @@ namespace Schedule.Migrations
             modelBuilder.Entity("Schedule.Models.Group", b =>
                 {
                     b.Navigation("Students");
-                });
-
-            modelBuilder.Entity("Schedule.Models.Lesson", b =>
-                {
-                    b.Navigation("Groups");
                 });
 
             modelBuilder.Entity("Schedule.Models.Teacher", b =>
