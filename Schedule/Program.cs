@@ -40,7 +40,15 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
-var connection = builder.Configuration.GetConnectionString("DefaultConnection");
+var connection = string.Format(
+    builder.Configuration.GetConnectionString("DefaultConnection"),
+    Environment.GetEnvironmentVariable("POSTGRES_HOST"),
+    Environment.GetEnvironmentVariable("POSTGRES_PORT"),
+    Environment.GetEnvironmentVariable("POSTGRES_DB_NAME"),
+    Environment.GetEnvironmentVariable("POSTGRES_USER"),
+    Environment.GetEnvironmentVariable("POSTGRES_PASSWORD")
+    );
+
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(connection));
 
 builder.Services.AddHttpContextAccessor();

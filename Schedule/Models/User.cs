@@ -1,4 +1,5 @@
-﻿using Schedule.Enums;
+﻿using Microsoft.EntityFrameworkCore;
+using Schedule.Enums;
 
 namespace Schedule.Models
 {

@@ -162,4 +162,7 @@
   <data name="USER_WRONG_ID_ERROR" xml:space="preserve">
     <value>User w/ id = {0} does not exist</value>
   </data>
+  <data name="ROOT_GIVEN_ERROR" xml:space="preserve">
+    <value>Can't register a new ROOT</value>
+  </data>
 </root>

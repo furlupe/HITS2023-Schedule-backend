@@ -5,7 +5,14 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "POSTGRES_HOST": "localhost",
+        "POSTGRES_PORT": "5432",
+        "POSTGRES_DB_NAME": "ScheduleDB",
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_PASSWORD": "1234",
+        "ROOT_USERNAME": "furlupe",
+        "ROOT_PASSWORD": "ilikehex"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5164"

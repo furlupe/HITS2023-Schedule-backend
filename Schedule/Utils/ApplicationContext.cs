@@ -22,21 +22,42 @@ namespace Schedule.Utils
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var rootRole = new Role { Id = Guid.NewGuid(), Value = RoleEnum.ROOT };
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Login)
+                .IsUnique();
+
+            modelBuilder.Entity<Lesson>()
+                .HasMany(l => l.Groups)
+                .WithMany();
 
             modelBuilder.Entity<Group>().HasData(
-                new Group { Number = 972103},
+                new Group { Number = 972103 },
                 new Group { Number = 972203 }
                 );
 
+            var rootRole = new Role { Id = Guid.NewGuid(), Value = RoleEnum.ROOT };
             modelBuilder.Entity<Role>()
                 .HasData(
-                    new Role { Id = Guid.NewGuid(), Value = RoleEnum.STUDENT},
+                    new Role { Id = Guid.NewGuid(), Value = RoleEnum.STUDENT },
                     new Role { Id = Guid.NewGuid(), Value = RoleEnum.TEACHER },
                     new Role { Id = Guid.NewGuid(), Value = RoleEnum.EDITOR },
                     new Role { Id = Guid.NewGuid(), Value = RoleEnum.ADMIN },
                     rootRole
                 );
+
+            var root = new User { 
+                Id = Guid.NewGuid(), 
+                Login = Environment.GetEnvironmentVariable("ROOT_USERNAME"), 
+                Password = Credentials.EncodePassword(
+                    Environment.GetEnvironmentVariable("ROOT_PASSWORD")
+                    ) 
+            };
+            modelBuilder.Entity<User>().HasData(root);
+
+            modelBuilder.Entity<Role>()
+                .HasMany(left => left.Users)
+                .WithMany(right => right.Roles)
+                .UsingEntity(j => j.HasData(new { RolesId = rootRole.Id, UsersId = root.Id }));
 
             base.OnModelCreating(modelBuilder);
         }

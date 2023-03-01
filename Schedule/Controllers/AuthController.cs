@@ -23,16 +23,16 @@ namespace Schedule.Controllers
         [Authorize(Policy = "NotBlacklisted")]
         public async Task<IActionResult> Register(RegistrationDTO user)
         {
+            var roleClaims = User.Claims.Where(c => c.Type == ClaimTypes.Role);
+            var senderRoles = new List<RoleEnum>();
+            foreach (var role in roleClaims)
+            {
+                Enum.TryParse(role.Value, out RoleEnum sendByRole);
+                senderRoles.Add(sendByRole);
+            }
+
             try
             {
-                var roleClaims = User.Claims.Where(c => c.Type == ClaimTypes.Role);
-                var senderRoles = new List<RoleEnum>();
-                foreach(var role in roleClaims)
-                {
-                    Enum.TryParse(role.Value, out RoleEnum sendByRole);
-                    senderRoles.Add(sendByRole);
-                }
-
                 if(user.Roles.Any(r => r == RoleEnum.ROOT))
                 {
                     throw new BadHttpRequestException(ErrorStrings.ROOT_GIVEN_ERROR);
@@ -40,7 +40,10 @@ namespace Schedule.Controllers
 
                 if(user.Roles.Any(r => r == RoleEnum.ADMIN) && !senderRoles.Contains(RoleEnum.ROOT))
                 {
-                    throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR);
+                    throw new BadHttpRequestException(
+                        ErrorStrings.ACCESS_DENIED_ERROR, 
+                        StatusCodes.Status403Forbidden
+                        );
                 }
 
                 await _authService.Register(user);

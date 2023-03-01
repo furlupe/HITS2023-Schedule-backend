@@ -41,6 +41,18 @@ namespace Schedule.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Groups",
+                columns: table => new
+                {
+                    Number = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Groups", x => x.Number);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -96,6 +108,31 @@ namespace Schedule.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Login = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false),
+                    TeacherProfileId = table.Column<Guid>(type: "uuid", nullable: true),
+                    GroupNumber = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_Groups_GroupNumber",
+                        column: x => x.GroupNumber,
+                        principalTable: "Groups",
+                        principalColumn: "Number");
+                    table.ForeignKey(
+                        name: "FK_Users_Teachers_TeacherProfileId",
+                        column: x => x.TeacherProfileId,
+                        principalTable: "Teachers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Lessons",
                 columns: table => new
                 {
@@ -136,43 +173,6 @@ namespace Schedule.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Groups",
-                columns: table => new
-                {
-                    Number = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Groups", x => x.Number);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Login = table.Column<string>(type: "text", nullable: false),
-                    Password = table.Column<string>(type: "text", nullable: false),
-                    TeacherProfileId = table.Column<Guid>(type: "uuid", nullable: true),
-                    GroupNumber = table.Column<int>(type: "integer", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Users_Groups_GroupNumber",
-                        column: x => x.GroupNumber,
-                        principalTable: "Groups",
-                        principalColumn: "Number");
-                    table.ForeignKey(
-                        name: "FK_Users_Teachers_TeacherProfileId",
-                        column: x => x.TeacherProfileId,
-                        principalTable: "Teachers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RoleUser",
                 columns: table => new
                 {
@@ -196,13 +196,37 @@ namespace Schedule.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "GroupLesson",
+                columns: table => new
+                {
+                    GroupsNumber = table.Column<int>(type: "integer", nullable: false),
+                    LessonId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GroupLesson", x => new { x.GroupsNumber, x.LessonId });
+                    table.ForeignKey(
+                        name: "FK_GroupLesson_Groups_GroupsNumber",
+                        column: x => x.GroupsNumber,
+                        principalTable: "Groups",
+                        principalColumn: "Number",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_GroupLesson_Lessons_LessonId",
+                        column: x => x.LessonId,
+                        principalTable: "Lessons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Groups",
-                columns: new[] { "Number", "LessonId" },
-                values: new object[,]
+                column: "Number",
+                values: new object[]
                 {
-                    { 972103, null },
-                    { 972203, null }
+                    972103,
+                    972203
                 });
 
             migrationBuilder.InsertData(
@@ -210,12 +234,27 @@ namespace Schedule.Migrations
                 columns: new[] { "Id", "Value" },
                 values: new object[,]
                 {
-                    { new Guid("3fd65f2c-e118-47da-907b-cef233c5083f"), 3 },
-                    { new Guid("68f7bdb8-7d62-4ff5-be08-548dd637aec9"), 4 },
-                    { new Guid("858da450-7c6a-4cfe-b3d2-611691734d9d"), 0 },
-                    { new Guid("e2a90f83-4ec2-4919-a916-75d089937f0a"), 1 },
-                    { new Guid("e50e33c0-669d-4d27-9d79-6329171a5a9c"), 2 }
+                    { new Guid("0c48542a-13f7-4387-af7f-c2ff4f74b89d"), 4 },
+                    { new Guid("4a1bf6b3-7a31-4dd4-be3a-113971ba4173"), 1 },
+                    { new Guid("52582bda-a6ce-48eb-8703-196cfe5d0df5"), 3 },
+                    { new Guid("8217a6f9-b788-41c1-a368-d5b46b87d98a"), 2 },
+                    { new Guid("d6bd1e12-5a8d-4a31-9809-be2870aff8ea"), 0 }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "GroupNumber", "Login", "Password", "TeacherProfileId" },
+                values: new object[] { new Guid("e955e37b-233c-4893-b2dc-c91a626a418f"), null, "furlupe", "3414A9BE42AE5049DD6DBEE1E2C70A986C2E5C20B6E7BF3DDA103678FDDAA7DB", null });
+
+            migrationBuilder.InsertData(
+                table: "RoleUser",
+                columns: new[] { "RolesId", "UsersId" },
+                values: new object[] { new Guid("0c48542a-13f7-4387-af7f-c2ff4f74b89d"), new Guid("e955e37b-233c-4893-b2dc-c91a626a418f") });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GroupLesson_LessonId",
+                table: "GroupLesson",
+                column: "LessonId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Lessons_CabinetNumber",
@@ -253,6 +292,12 @@ namespace Schedule.Migrations
                 column: "GroupNumber");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_Login",
+                table: "Users",
+                column: "Login",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_TeacherProfileId",
                 table: "Users",
                 column: "TeacherProfileId");
@@ -265,19 +310,19 @@ namespace Schedule.Migrations
                 name: "Blacklist");
 
             migrationBuilder.DropTable(
+                name: "GroupLesson");
+
+            migrationBuilder.DropTable(
                 name: "RoleUser");
+
+            migrationBuilder.DropTable(
+                name: "Lessons");
 
             migrationBuilder.DropTable(
                 name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Groups");
-
-            migrationBuilder.DropTable(
-                name: "Lessons");
 
             migrationBuilder.DropTable(
                 name: "Cabinets");
@@ -287,6 +332,9 @@ namespace Schedule.Migrations
 
             migrationBuilder.DropTable(
                 name: "Timeslots");
+
+            migrationBuilder.DropTable(
+                name: "Groups");
 
             migrationBuilder.DropTable(
                 name: "Teachers");

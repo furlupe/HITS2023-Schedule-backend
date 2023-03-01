@@ -22,6 +22,21 @@ namespace Schedule.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("GroupLesson", b =>
+                {
+                    b.Property<int>("GroupsNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("LessonId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("GroupsNumber", "LessonId");
+
+                    b.HasIndex("LessonId");
+
+                    b.ToTable("GroupLesson");
+                });
+
             modelBuilder.Entity("RoleUser", b =>
                 {
                     b.Property<Guid>("RolesId")
@@ -35,6 +50,13 @@ namespace Schedule.Migrations
                     b.HasIndex("UsersId");
 
                     b.ToTable("RoleUser");
+
+                    b.HasData(
+                        new
+                        {
+                            RolesId = new Guid("0c48542a-13f7-4387-af7f-c2ff4f74b89d"),
+                            UsersId = new Guid("e955e37b-233c-4893-b2dc-c91a626a418f")
+                        });
                 });
 
             modelBuilder.Entity("Schedule.Models.BlacklistedToken", b =>
@@ -79,12 +101,7 @@ namespace Schedule.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Number"));
 
-                    b.Property<Guid?>("LessonId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Number");
-
-                    b.HasIndex("LessonId");
 
                     b.ToTable("Groups");
 
@@ -149,27 +166,27 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("858da450-7c6a-4cfe-b3d2-611691734d9d"),
+                            Id = new Guid("d6bd1e12-5a8d-4a31-9809-be2870aff8ea"),
                             Value = 0
                         },
                         new
                         {
-                            Id = new Guid("e2a90f83-4ec2-4919-a916-75d089937f0a"),
+                            Id = new Guid("4a1bf6b3-7a31-4dd4-be3a-113971ba4173"),
                             Value = 1
                         },
                         new
                         {
-                            Id = new Guid("e50e33c0-669d-4d27-9d79-6329171a5a9c"),
+                            Id = new Guid("8217a6f9-b788-41c1-a368-d5b46b87d98a"),
                             Value = 2
                         },
                         new
                         {
-                            Id = new Guid("3fd65f2c-e118-47da-907b-cef233c5083f"),
+                            Id = new Guid("52582bda-a6ce-48eb-8703-196cfe5d0df5"),
                             Value = 3
                         },
                         new
                         {
-                            Id = new Guid("68f7bdb8-7d62-4ff5-be08-548dd637aec9"),
+                            Id = new Guid("0c48542a-13f7-4387-af7f-c2ff4f74b89d"),
                             Value = 4
                         });
                 });
@@ -250,9 +267,35 @@ namespace Schedule.Migrations
 
                     b.HasIndex("GroupNumber");
 
+                    b.HasIndex("Login")
+                        .IsUnique();
+
                     b.HasIndex("TeacherProfileId");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("e955e37b-233c-4893-b2dc-c91a626a418f"),
+                            Login = "furlupe",
+                            Password = "3414A9BE42AE5049DD6DBEE1E2C70A986C2E5C20B6E7BF3DDA103678FDDAA7DB"
+                        });
+                });
+
+            modelBuilder.Entity("GroupLesson", b =>
+                {
+                    b.HasOne("Schedule.Models.Group", null)
+                        .WithMany()
+                        .HasForeignKey("GroupsNumber")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Schedule.Models.Lesson", null)
+                        .WithMany()
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("RoleUser", b =>
@@ -268,13 +311,6 @@ namespace Schedule.Migrations
                         .HasForeignKey("UsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Schedule.Models.Group", b =>
-                {
-                    b.HasOne("Schedule.Models.Lesson", null)
-                        .WithMany("Groups")
-                        .HasForeignKey("LessonId");
                 });
 
             modelBuilder.Entity("Schedule.Models.Lesson", b =>
@@ -337,11 +373,6 @@ namespace Schedule.Migrations
             modelBuilder.Entity("Schedule.Models.Group", b =>
                 {
                     b.Navigation("Students");
-                });
-
-            modelBuilder.Entity("Schedule.Models.Lesson", b =>
-                {
-                    b.Navigation("Groups");
                 });
 
             modelBuilder.Entity("Schedule.Models.Teacher", b =>
