@@ -49,7 +49,7 @@ namespace Schedule.Services
 
             await _context.SaveChangesAsync();
         }
-        public async Task Register(RegistrationDTO user)
+        public async Task Register(RegistrationDto user)
         {
             var group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == user.GroupNumber);
 

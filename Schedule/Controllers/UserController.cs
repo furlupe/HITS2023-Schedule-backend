@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Schedule.Enums;
-using Schedule.Exceptions;
-using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Services;
 using Schedule.Utils;
