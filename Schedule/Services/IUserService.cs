@@ -5,11 +5,9 @@ namespace Schedule.Services
 {
     public interface IUserService
     {
-        Task<ICollection<UserInfoDto>> GetUsers(ICollection<Role> roles);
+        Task<ICollection<UserInfoDto>> GetUsers(ICollection<RoleEnum> roles);
         Task<UserInfoDto> GetUser(Guid id);
-        Task UpdateToStudent(Guid id, UserShortInfoDto data);
-        Task UpdateToTeacher(Guid id, UserShortInfoDto data);
-        Task UpdateToStaff(Guid id, UserShortInfoDto data);
-        Task DeleteUser(Guid id);
+        Task UpdateUser(Guid id, UserShortInfoDto data);
+        Task DeleteUser(Guid id, IEnumerable<RoleEnum> senderRoles);
     }
 }

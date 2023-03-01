@@ -42,11 +42,12 @@ builder.Services.AddSwaggerGen(option =>
 
 var connection = string.Format(
     builder.Configuration.GetConnectionString("DefaultConnection"),
-    Environment.GetEnvironmentVariable("DB_HOST"),
-    Environment.GetEnvironmentVariable("DB_PORT"),
-    Environment.GetEnvironmentVariable("DB_NAME"),
-    Environment.GetEnvironmentVariable("DB_USER"),
-    Environment.GetEnvironmentVariable("DB_PASSWORD"));
+    Environment.GetEnvironmentVariable("POSTGRES_HOST"),
+    Environment.GetEnvironmentVariable("POSTGRES_PORT"),
+    Environment.GetEnvironmentVariable("POSTGRES_DB_NAME"),
+    Environment.GetEnvironmentVariable("POSTGRES_USER"),
+    Environment.GetEnvironmentVariable("POSTGRES_PASSWORD")
+    );
 
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(connection));
 
@@ -55,6 +56,8 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IAuthorizationHandler, BlacklistAuthRequirementHandler>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<ILessonService, LessonService>();
+builder.Services.AddTransient<ICabinetService, CabinetService>();
 
 builder.Services.AddAuthorization(options =>
 {

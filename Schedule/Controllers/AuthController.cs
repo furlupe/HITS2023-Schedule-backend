@@ -19,33 +19,34 @@ namespace Schedule.Controllers
         }
 
         [HttpPost("register")]
-        [RoleAuthorization(Role.ADMIN | Role.ROOT)]
+        [RoleAuthorization(RoleEnum.ADMIN | RoleEnum.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
         public async Task<IActionResult> Register(RegistrationDto user)
         {
+            var roleClaims = User.Claims.Where(c => c.Type == ClaimTypes.Role);
+            var senderRoles = new List<RoleEnum>();
+            foreach (var role in roleClaims)
+            {
+                Enum.TryParse(role.Value, out RoleEnum sendByRole);
+                senderRoles.Add(sendByRole);
+            }
+
             try
             {
-                var roleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-                Enum.TryParse(roleClaim.Value, out Role sendByRole);
-
-                switch (user.Role)
+                if(user.Roles.Any(r => r == RoleEnum.ROOT))
                 {
-                    case Role.STUDENT: await _authService.RegisterStudent(user); break;
-                    case Role.TEACHER: await _authService.RegisterTeacher(user); break;
-                    case Role.EDITOR: await _authService.RegisterStaff(user); break;
-                    case Role.ADMIN:
-                        {
-                            if (sendByRole is not Role.ROOT)
-                            {
-                                throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR, StatusCodes.Status403Forbidden);
-                            }
-                            await _authService.RegisterStaff(user);
-                            break;
-                        }
-                    case Role.ROOT: throw new BadHttpRequestException(ErrorStrings.ROOT_GIVEN_ERROR, StatusCodes.Status403Forbidden);
-                    default: throw new BadHttpRequestException("", 500);
+                    throw new BadHttpRequestException(ErrorStrings.ROOT_GIVEN_ERROR);
                 }
 
+                if(user.Roles.Any(r => r == RoleEnum.ADMIN) && !senderRoles.Contains(RoleEnum.ROOT))
+                {
+                    throw new BadHttpRequestException(
+                        ErrorStrings.ACCESS_DENIED_ERROR, 
+                        StatusCodes.Status403Forbidden
+                        );
+                }
+
+                await _authService.Register(user);
                 return Ok();
             }
             catch (BadHttpRequestException e)

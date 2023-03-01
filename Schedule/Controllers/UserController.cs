@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Schedule.Enums;
+using Schedule.Exceptions;
+using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Services;
 using Schedule.Utils;
@@ -20,7 +22,7 @@ namespace Schedule.Controllers
         }
         [HttpGet]
         [Authorize(Policy = "NotBlacklisted")]
-        public async Task<ActionResult<ICollection<UserInfoDto>>> GetListOfUsers([FromQuery(Name = "role")] ICollection<Role> roles)
+        public async Task<ActionResult<ICollection<UserInfoDto>>> GetListOfUsers([FromQuery(Name = "role")] ICollection<RoleEnum> roles)
         {
             return Ok(await _userService.GetUsers(roles));
         }
@@ -37,7 +39,7 @@ namespace Schedule.Controllers
         }
 
         [HttpGet("{id}")]
-        [RoleAuthorization(Role.ADMIN | Role.ROOT)]
+        [RoleAuthorization(RoleEnum.ADMIN | RoleEnum.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
         public async Task<ActionResult<UserInfoDto>> GetUser([BindRequired] Guid id)
         {
@@ -52,32 +54,26 @@ namespace Schedule.Controllers
         }
 
         [HttpPut("{id}")]
-        [RoleAuthorization(Role.ADMIN | Role.ROOT)]
+        [RoleAuthorization(RoleEnum.ADMIN | RoleEnum.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
-        public async Task<IActionResult> UpdateUser(UserShortInfoDto data, [BindRequired] Guid id)
+        public async Task<IActionResult> UpdateUser([BindRequired] Guid id, UserShortInfoDto data)
         {
-            var roleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-            Enum.TryParse(roleClaim.Value, out Role sendByRole);
+            var senderRoles = AccessRoles(User.Claims);
 
             try
             {
-                switch (data.Role)
+                if (data.Roles.Any(r => r == RoleEnum.ROOT))
                 {
-                    case Role.STUDENT: await _userService.UpdateToStudent(id, data); break;
-                    case Role.TEACHER: await _userService.UpdateToTeacher(id, data); break;
-                    case Role.EDITOR: await _userService.UpdateToStaff(id, data); break;
-                    case Role.ADMIN:
-                        {
-                            if (sendByRole is not Role.ROOT)
-                            {
-                                throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR, StatusCodes.Status403Forbidden);
-                            }
-                            await _userService.UpdateToStaff(id, data); break;
-                        }
-                    case Role.ROOT: throw new BadHttpRequestException(ErrorStrings.ROOT_GIVEN_ERROR, StatusCodes.Status403Forbidden);
-                    default: throw new BadHttpRequestException("", StatusCodes.Status500InternalServerError);
+                    throw new BadHttpRequestException(ErrorStrings.ACCESS_DENIED);
                 }
 
+                if (data.Roles.Any(r => r == RoleEnum.ADMIN) 
+                    && !senderRoles.Contains(RoleEnum.ROOT))
+                {
+                    throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR);
+                }
+
+                await _userService.UpdateUser(id, data);
                 return Ok();
             }
             catch (BadHttpRequestException e)
@@ -87,19 +83,34 @@ namespace Schedule.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RoleAuthorization(Role.ADMIN | Role.ROOT)]
+        [RoleAuthorization(RoleEnum.ADMIN | RoleEnum.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
         public async Task<IActionResult> DeleteUser([BindRequired] Guid id)
         {
+            var senderRoles = AccessRoles(User.Claims);
+
             try
             {
-                await _userService.DeleteUser(id);
+                await _userService.DeleteUser(id, senderRoles);
                 return Ok();
             }
             catch (BadHttpRequestException e)
             {
                 return StatusCode(e.StatusCode, new { error = e.Message });
             }
+        }
+
+        private List<RoleEnum> AccessRoles(IEnumerable<Claim> claims)
+        {
+            var roleClaims = claims.Where(c => c.Type == ClaimTypes.Role);
+            var senderRoles = new List<RoleEnum>();
+            foreach (var role in roleClaims)
+            {
+                Enum.TryParse(role.Value, out RoleEnum sendByRole);
+                senderRoles.Add(sendByRole);
+            }
+
+            return senderRoles;
         }
     }
 }

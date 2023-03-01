@@ -18,68 +18,11 @@ namespace Schedule.Services
             _context = context;
         }
 
-        public async Task RegisterStudent(RegistrationDto student)
-        {
-            var group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == student.GroupNumber);
-            if (group is null)
-            {
-                throw new BadHttpRequestException(
-                    ErrorStrings.GROUP_WRONG_ID_ERROR, 
-                    StatusCodes.Status404NotFound);
-            }
-
-            await Register(new User
-            {
-                Login = student.Login,
-                Password = Credentials.EncodePassword(student.Password),
-                Role = student.Role,
-                Group = group,
-                TeacherProfile = null
-            });
-        }
-        public async Task RegisterTeacher(RegistrationDto teacher)
-        {
-            var t = await _context.Teachers.SingleOrDefaultAsync(t => t.Id == teacher.TeacherID);
-            if (t is null)
-            {
-                throw new BadHttpRequestException(
-                    ErrorStrings.TEACHER_WRONG_ID_ERROR, 
-                    StatusCodes.Status404NotFound);
-            }
-
-            if (await _context.Users.AnyAsync(u => u.TeacherProfile == t))
-            {
-                throw new BadHttpRequestException(
-                    ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR, 
-                    StatusCodes.Status409Conflict);
-            }
-
-            await Register(new User
-            {
-                Login = teacher.Login,
-                Password = Credentials.EncodePassword(teacher.Password),
-                Role = teacher.Role,
-                Group = null,
-                TeacherProfile = t
-            });
-        }
-        public async Task RegisterStaff(RegistrationDto staff)
-        {
-            await Register(new User
-            {
-                Login = staff.Login,
-                Password = Credentials.EncodePassword(staff.Password),
-                Role = staff.Role,
-                Group = null,
-                TeacherProfile = null
-            });
-        }
-
         public async Task<JsonResult> MobileLogin(LoginCredentials credentials)
         {
             var user = await GetUserByCredentials(credentials);
             if (user is null ||
-                user.Role != Role.STUDENT && user.Role != Role.TEACHER)
+                !user.Roles.Any(r => r.Value == RoleEnum.STUDENT || r.Value == RoleEnum.TEACHER))
             {
                 throw new BadHttpRequestException(ErrorStrings.INVALID_CREDENTIALS_ERROR);
             }
@@ -90,8 +33,7 @@ namespace Schedule.Services
         {
             var user = await GetUserByCredentials(credentials);
             if (user is null ||
-                user.Role == Role.STUDENT ||
-                user.Role == Role.TEACHER)
+                user.Roles.Any(r => r.Value == RoleEnum.STUDENT || r.Value == RoleEnum.TEACHER))
             {
                 throw new BadHttpRequestException(ErrorStrings.INVALID_CREDENTIALS_ERROR);
             }
@@ -107,22 +49,60 @@ namespace Schedule.Services
 
             await _context.SaveChangesAsync();
         }
-
-        private async Task Register(User user)
+        public async Task Register(RegistrationDTO user)
         {
+            var group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == user.GroupNumber);
+
+            if (user.Roles.Any(r => r == RoleEnum.STUDENT) && group is null)
+            {
+                throw new BadHttpRequestException(
+                    string.Format(ErrorStrings.GROUP_WRONG_ID_ERROR, user.GroupNumber)
+                    );
+            }
+
+            var teacher = await _context.Teachers.SingleOrDefaultAsync(t => t.Id == user.TeacherID);
+
+            if (user.Roles.Any(r => r == RoleEnum.TEACHER) && teacher is null)
+            {
+                throw new BadHttpRequestException(
+                    string.Format(ErrorStrings.TEACHER_NO_ID_ERROR, user.TeacherID)
+                    );
+            }
+
+            if (user.Roles.Any(r => r == RoleEnum.TEACHER) && 
+                await _context.Users.AnyAsync(u => u.TeacherProfile == teacher))
+            {
+                throw new BadHttpRequestException(
+                    string.Format(ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR, user.TeacherID)
+                    );
+            }
+
             if (await _context.Users.AnyAsync(u => u.Login == user.Login))
             {
                 throw new BadHttpRequestException(
                     ErrorStrings.LOGIN_TAKEN_ERROR, 
                     StatusCodes.Status409Conflict);
             }
-            await _context.Users.AddAsync(user);
+
+            var roles = await _context.Roles.Where(r => user.Roles.Contains(r.Value)).ToListAsync();
+
+            await _context.Users.AddAsync(new User
+            {
+                Login = user.Login,
+                Password = Credentials.EncodePassword(user.Password),
+                Roles = roles,
+                TeacherProfile = teacher,
+                Group = group
+            });
+
             await _context.SaveChangesAsync();
         }
+
         private async Task<User?> GetUserByCredentials(LoginCredentials credentials)
         {
             var hashedPassword = Credentials.EncodePassword(credentials.Password);
             return await _context.Users
+                .Include(u => u.Roles)
                 .SingleOrDefaultAsync(u => u.Login == credentials.Login && u.Password == hashedPassword);
         }
         private JsonResult CreateToken(User user)
@@ -150,9 +130,13 @@ namespace Schedule.Services
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Id.ToString()),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
+                new Claim(ClaimTypes.Name, user.Id.ToString())
             };
+
+            foreach(var role in user.Roles.Select(r => r.Value))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+            }
 
             return new ClaimsIdentity(claims, "Token");
         }
