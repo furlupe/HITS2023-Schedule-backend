@@ -54,6 +54,8 @@ builder.Services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(c
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IRandomStringGenerator, RandomStringGenerator>();
 builder.Services.AddTransient<IAuthorizationHandler, BlacklistAuthRequirementHandler>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
@@ -78,7 +80,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = JwtConfigurations.Audience,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = JwtConfigurations.GetSymmetricSecurityKey()
+            IssuerSigningKey = JwtConfigurations.GetSymmetricSecurityKey(),
+            ClockSkew = TimeSpan.Zero
         };
     });
 

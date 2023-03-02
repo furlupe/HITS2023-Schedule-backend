@@ -18,6 +18,19 @@ namespace Schedule.Controllers
             _authService = authService;
         }
 
+        [HttpPost("/refresh")]
+        public async Task<IActionResult> Refresh([FromQuery] string token)
+        {
+            try
+            {
+                return Ok(await _authService.Refresh(token));
+            }
+            catch(BadHttpRequestException e)
+            {
+                return StatusCode(e.StatusCode, new { error = e.Message });
+            }
+        }
+
         [HttpPost("register")]
         [RoleAuthorization(RoleEnum.ADMIN | RoleEnum.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
@@ -60,7 +73,7 @@ namespace Schedule.Controllers
         {
             try
             {
-                return await _authService.MobileLogin(credentials);
+                return Ok(await _authService.MobileLogin(credentials));
             }
             catch (BadHttpRequestException e)
             {
@@ -73,7 +86,7 @@ namespace Schedule.Controllers
         {
             try
             {
-                return await _authService.WebLogin(credentials);
+                return Ok(await _authService.WebLogin(credentials));
             }
             catch (BadHttpRequestException e)
             {

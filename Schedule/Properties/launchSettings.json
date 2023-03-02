@@ -6,13 +6,13 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
+        "ROOT_USERNAME": "furlupe",
+        "ROOT_PASSWORD": "ilikehex",
         "POSTGRES_HOST": "localhost",
         "POSTGRES_PORT": "5432",
-        "POSTGRES_DB_NAME": "ScheduleDB",
         "POSTGRES_USER": "postgres",
         "POSTGRES_PASSWORD": "1234",
-        "ROOT_USERNAME": "furlupe",
-        "ROOT_PASSWORD": "ilikehex"
+        "POSTGRES_DB_NAME": "ScheduleDB"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5164"
@@ -22,7 +22,14 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ROOT_USERNAME": "furlupe",
+        "ROOT_PASSWORD": "ilikehex",
+        "POSTGRES_HOST": "localhost",
+        "POSTGRES_PORT": "5432",
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_PASSWORD": "1234",
+        "POSTGRES_DB_NAME": "ScheduleDB"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7159;http://localhost:5164"
@@ -32,7 +39,14 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ROOT_USERNAME": "furlupe",
+        "ROOT_PASSWORD": "ilikehex",
+        "POSTGRES_HOST": "localhost",
+        "POSTGRES_PORT": "5432",
+        "POSTGRES_USER": "postgres",
+        "POSTGRES_PASSWORD": "1234",
+        "POSTGRES_DB_NAME": "ScheduleDB"
       }
     },
     "Docker": {

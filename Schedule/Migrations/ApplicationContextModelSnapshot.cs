@@ -54,8 +54,8 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            RolesId = new Guid("0c48542a-13f7-4387-af7f-c2ff4f74b89d"),
-                            UsersId = new Guid("e955e37b-233c-4893-b2dc-c91a626a418f")
+                            RolesId = new Guid("f9a93e33-a471-41af-b02d-10b17d50022b"),
+                            UsersId = new Guid("1977e097-8eac-4cef-9099-ed1a3b6f9112")
                         });
                 });
 
@@ -150,6 +150,24 @@ namespace Schedule.Migrations
                     b.ToTable("Lessons");
                 });
 
+            modelBuilder.Entity("Schedule.Models.RefreshToken", b =>
+                {
+                    b.Property<string>("Value")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Expiry")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Value");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("Schedule.Models.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -166,27 +184,27 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("d6bd1e12-5a8d-4a31-9809-be2870aff8ea"),
+                            Id = new Guid("2b820302-a95a-4631-b6c7-7b056fc9eb68"),
                             Value = 0
                         },
                         new
                         {
-                            Id = new Guid("4a1bf6b3-7a31-4dd4-be3a-113971ba4173"),
+                            Id = new Guid("cde52baf-fa25-47e8-8787-64d5f1a520b2"),
                             Value = 1
                         },
                         new
                         {
-                            Id = new Guid("8217a6f9-b788-41c1-a368-d5b46b87d98a"),
+                            Id = new Guid("2ffb27a0-5ca7-4381-8fe1-d53c54b6e0d2"),
                             Value = 2
                         },
                         new
                         {
-                            Id = new Guid("52582bda-a6ce-48eb-8703-196cfe5d0df5"),
+                            Id = new Guid("ed64f894-d908-4c02-b17c-37fd4f403058"),
                             Value = 3
                         },
                         new
                         {
-                            Id = new Guid("0c48542a-13f7-4387-af7f-c2ff4f74b89d"),
+                            Id = new Guid("f9a93e33-a471-41af-b02d-10b17d50022b"),
                             Value = 4
                         });
                 });
@@ -277,7 +295,7 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("e955e37b-233c-4893-b2dc-c91a626a418f"),
+                            Id = new Guid("1977e097-8eac-4cef-9099-ed1a3b6f9112"),
                             Login = "furlupe",
                             Password = "3414A9BE42AE5049DD6DBEE1E2C70A986C2E5C20B6E7BF3DDA103678FDDAA7DB"
                         });
@@ -346,6 +364,17 @@ namespace Schedule.Migrations
                     b.Navigation("Teacher");
 
                     b.Navigation("Timeslot");
+                });
+
+            modelBuilder.Entity("Schedule.Models.RefreshToken", b =>
+                {
+                    b.HasOne("Schedule.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Schedule.Models.Subject", b =>

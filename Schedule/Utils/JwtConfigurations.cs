@@ -8,7 +8,7 @@ namespace Schedule.Utils
         public const string Issuer = "Furlupe";
         public const string Audience = "JwtClient";
         private const string Key = "FortniteHambugerSussyBalls445";
-        public const int Lifetime = 30;
+        public const int Lifetime = 10;
         public static SymmetricSecurityKey GetSymmetricSecurityKey() =>
             new(Encoding.ASCII.GetBytes(Key));
     }
