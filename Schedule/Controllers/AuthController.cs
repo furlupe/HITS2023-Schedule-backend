@@ -27,7 +27,7 @@ namespace Schedule.Controllers
             }
             catch(BadHttpRequestException e)
             {
-                return StatusCode(e.StatusCode, new { error = e.Message });
+                return StatusCode(e.StatusCode);
             }
         }
 
