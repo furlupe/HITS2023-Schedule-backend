@@ -7,9 +7,11 @@ namespace Schedule.Services
     {
         Task Register(RegistrationDto user);
 
-        Task<JsonResult> MobileLogin(LoginCredentials user);
-        Task<JsonResult> WebLogin(LoginCredentials user);
+        Task<TokensDto> MobileLogin(LoginCredentials user);
+        Task<TokensDto> WebLogin(LoginCredentials user);
 
         Task Logout(string token);
+
+        Task<TokensDto> Refresh(string token);
     }
 }

@@ -5,6 +5,7 @@ using Schedule.Enums;
 using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Utils;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
@@ -13,12 +14,14 @@ namespace Schedule.Services
     public class AuthService : IAuthService
     {
         private readonly ApplicationContext _context;
-        public AuthService(ApplicationContext context)
+        private readonly ITokenService _tokenService;
+        public AuthService(ApplicationContext context, ITokenService tokenService)
         {
             _context = context;
+            _tokenService = tokenService;
         }
 
-        public async Task<JsonResult> MobileLogin(LoginCredentials credentials)
+        public async Task<TokensDto> MobileLogin(LoginCredentials credentials)
         {
             var user = await GetUserByCredentials(credentials);
             if (user is null ||
@@ -27,9 +30,9 @@ namespace Schedule.Services
                 throw new BadHttpRequestException(ErrorStrings.INVALID_CREDENTIALS_ERROR);
             }
 
-            return CreateToken(user);
+            return await Login(user);
         }
-        public async Task<JsonResult> WebLogin(LoginCredentials credentials)
+        public async Task<TokensDto> WebLogin(LoginCredentials credentials)
         {
             var user = await GetUserByCredentials(credentials);
             if (user is null ||
@@ -38,8 +41,9 @@ namespace Schedule.Services
                 throw new BadHttpRequestException(ErrorStrings.INVALID_CREDENTIALS_ERROR);
             }
 
-            return CreateToken(user);
+            return await Login(user);
         }
+
         public async Task Logout(string token)
         {
             await _context.Blacklist.AddAsync(new BlacklistedToken
@@ -49,7 +53,8 @@ namespace Schedule.Services
 
             await _context.SaveChangesAsync();
         }
-        public async Task Register(RegistrationDto user)
+
+        public async Task Register(RegistrationDTO user)
         {
             var group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == user.GroupNumber);
 
@@ -98,6 +103,21 @@ namespace Schedule.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task<TokensDto> Refresh(string token)
+        {
+            var rt = await _context.RefreshTokens
+                .Include(t => t.User)
+                    .ThenInclude(u => u.Roles)
+                .SingleOrDefaultAsync(t => t.Value == token);
+
+            if(rt is null || rt.Expiry < DateTime.UtcNow)
+            {
+                throw new BadHttpRequestException(string.Empty, StatusCodes.Status401Unauthorized);
+            }
+
+            return await Login(rt.User);
+        }
+
         private async Task<User?> GetUserByCredentials(LoginCredentials credentials)
         {
             var hashedPassword = Credentials.EncodePassword(credentials.Password);
@@ -105,40 +125,32 @@ namespace Schedule.Services
                 .Include(u => u.Roles)
                 .SingleOrDefaultAsync(u => u.Login == credentials.Login && u.Password == hashedPassword);
         }
-        private JsonResult CreateToken(User user)
+        private async Task<TokensDto> Login(User user)
         {
-            ClaimsIdentity? identity = GetIdentity(user);
-            var now = DateTime.UtcNow;
-            var jwt = new JwtSecurityToken(
-                issuer: JwtConfigurations.Issuer,
-                audience: JwtConfigurations.Audience,
-                notBefore: now,
-                claims: identity.Claims,
-                expires: now.AddMinutes(JwtConfigurations.Lifetime),
-                signingCredentials: new SigningCredentials(JwtConfigurations.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
-            var enctoken = new JwtSecurityTokenHandler().WriteToken(jwt);
+            var refreshToken = _tokenService.CreateRefreshToken();
+            var rtUser = await _context.RefreshTokens.SingleOrDefaultAsync(u => u.User == user);
 
-            var response = new
+            var response = new TokensDto
             {
-                token = enctoken
+                AccessToken = _tokenService.CreateAccessToken(user),
+                RefreshToken = refreshToken
             };
 
-            return new JsonResult(response);
-        }
-        private ClaimsIdentity GetIdentity(User user)
-        {
-
-            var claims = new List<Claim>
+            if (rtUser is not null)
             {
-                new Claim(ClaimTypes.Name, user.Id.ToString())
-            };
-
-            foreach(var role in user.Roles.Select(r => r.Value))
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+                _context.RefreshTokens.Remove(rtUser);
             }
 
-            return new ClaimsIdentity(claims, "Token");
+            await _context.RefreshTokens.AddAsync(new RefreshToken
+            {
+                Value = refreshToken,
+                User = user,
+                Expiry = DateTime.UtcNow.AddDays(60)
+            });
+
+            await _context.SaveChangesAsync();
+
+            return response;
         }
 
     }

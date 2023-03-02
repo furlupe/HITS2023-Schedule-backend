@@ -15,6 +15,7 @@ namespace Schedule.Utils
         public DbSet<Subject> Subjects { get; set; }
         public DbSet<BlacklistedToken> Blacklist { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
             Database.EnsureCreated();
@@ -47,9 +48,9 @@ namespace Schedule.Utils
 
             var root = new User { 
                 Id = Guid.NewGuid(), 
-                Login = Environment.GetEnvironmentVariable("ROOT_USERNAME"), 
+                Login = "furlupe", 
                 Password = Credentials.EncodePassword(
-                    Environment.GetEnvironmentVariable("ROOT_PASSWORD")
+                    "ilikehex"
                     ) 
             };
             modelBuilder.Entity<User>().HasData(root);
