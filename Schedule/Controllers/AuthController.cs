@@ -18,8 +18,8 @@ namespace Schedule.Controllers
             _authService = authService;
         }
 
-        [HttpPost("/refresh")]
-        public async Task<IActionResult> Refresh([FromQuery] string token)
+        [HttpPost("refresh")]
+        public async Task<ActionResult<TokensDto>> Refresh([FromQuery] string token)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace Schedule.Controllers
         }
 
         [HttpPost("login/mobile")]
-        public async Task<IActionResult> MobileLogin(LoginCredentials credentials)
+        public async Task<ActionResult<TokensDto>> MobileLogin(LoginCredentials credentials)
         {
             try
             {
@@ -82,7 +82,7 @@ namespace Schedule.Controllers
         }
 
         [HttpPost("login/web")]
-        public async Task<IActionResult> WebLogin(LoginCredentials credentials)
+        public async Task<ActionResult<TokensDto>> WebLogin(LoginCredentials credentials)
         {
             try
             {

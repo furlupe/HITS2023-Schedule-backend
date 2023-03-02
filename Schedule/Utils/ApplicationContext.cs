@@ -48,9 +48,9 @@ namespace Schedule.Utils
 
             var root = new User { 
                 Id = Guid.NewGuid(), 
-                Login = "furlupe", 
+                Login = Environment.GetEnvironmentVariable("ROOT_USERNAME"), 
                 Password = Credentials.EncodePassword(
-                    "ilikehex"
+                    Environment.GetEnvironmentVariable("ROOT_PASSWORD")
                     ) 
             };
             modelBuilder.Entity<User>().HasData(root);

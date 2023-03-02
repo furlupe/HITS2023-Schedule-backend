@@ -5,7 +5,7 @@ networks:
 
 services:
   schedule:
-    image: furlupe/schedule:latest
+    image: furlupe/schedule:1.2
     env_file: ./app.env
     depends_on: 
       - database
