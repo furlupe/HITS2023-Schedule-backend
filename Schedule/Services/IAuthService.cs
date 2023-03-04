@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Schedule.Models.DTO;
+﻿using Schedule.Models.DTO;
 
 namespace Schedule.Services
 {

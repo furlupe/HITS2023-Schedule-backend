@@ -7,7 +7,7 @@
             Random random = new Random();
             string randomString = string.Empty;
 
-            while(randomString.Length < length)
+            while (randomString.Length < length)
             {
                 randomString += alphabet[random.Next(alphabet.Length)];
             }

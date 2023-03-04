@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Schedule.Enums;
-
-namespace Schedule.Models
+﻿namespace Schedule.Models
 {
     public class User
     {
