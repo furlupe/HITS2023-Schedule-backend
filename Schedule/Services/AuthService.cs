@@ -1,13 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.EntityFrameworkCore;
 using Schedule.Enums;
 using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Utils;
 using System.Data;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace Schedule.Services
 {
@@ -74,7 +70,7 @@ namespace Schedule.Services
                     );
             }
 
-            if (user.Roles.Any(r => r == RoleEnum.TEACHER) && 
+            if (user.Roles.Any(r => r == RoleEnum.TEACHER) &&
                 await _context.Users.AnyAsync(u => u.TeacherProfile == teacher))
             {
                 throw new BadHttpRequestException(
@@ -108,7 +104,7 @@ namespace Schedule.Services
                     .ThenInclude(u => u.Roles)
                 .SingleOrDefaultAsync(t => t.Value == token);
 
-            if(rt is null || rt.Expiry < DateTime.UtcNow)
+            if (rt is null || rt.Expiry < DateTime.UtcNow)
             {
                 throw new BadHttpRequestException(string.Empty, StatusCodes.Status401Unauthorized);
             }

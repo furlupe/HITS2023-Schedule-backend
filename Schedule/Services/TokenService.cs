@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using Schedule.Models;
 using Schedule.Utils;
 using System.IdentityModel.Tokens.Jwt;

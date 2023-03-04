@@ -20,16 +20,7 @@ namespace Schedule.Controllers
 
         [HttpPost("/refresh")]
         public async Task<IActionResult> Refresh([FromQuery] string token)
-        {
-            try
-            {
-                return Ok(await _authService.Refresh(token));
-            }
-            catch(BadHttpRequestException e)
-            {
-                return StatusCode(e.StatusCode);
-            }
-        }
+            => Ok(await _authService.Refresh(token));
 
         [HttpPost("register")]
         [RoleAuthorization(RoleEnum.ADMIN | RoleEnum.ROOT)]
@@ -44,55 +35,30 @@ namespace Schedule.Controllers
                 senderRoles.Add(sendByRole);
             }
 
-            try
+            if (user.Roles.Any(r => r == RoleEnum.ROOT))
             {
-                if(user.Roles.Any(r => r == RoleEnum.ROOT))
-                {
-                    throw new BadHttpRequestException(ErrorStrings.ROOT_GIVEN_ERROR);
-                }
-
-                if(user.Roles.Any(r => r == RoleEnum.ADMIN) && !senderRoles.Contains(RoleEnum.ROOT))
-                {
-                    throw new BadHttpRequestException(
-                        ErrorStrings.ACCESS_DENIED_ERROR, 
-                        StatusCodes.Status403Forbidden
-                        );
-                }
-
-                await _authService.Register(user);
-                return Ok();
+                throw new BadHttpRequestException(ErrorStrings.ROOT_GIVEN_ERROR);
             }
-            catch (BadHttpRequestException e)
+
+            if (user.Roles.Any(r => r == RoleEnum.ADMIN) && !senderRoles.Contains(RoleEnum.ROOT))
             {
-                return StatusCode(e.StatusCode, new { error = e.Message });
+                throw new BadHttpRequestException(
+                    ErrorStrings.ACCESS_DENIED_ERROR,
+                    StatusCodes.Status403Forbidden
+                    );
             }
+
+            await _authService.Register(user);
+            return Ok();
         }
 
         [HttpPost("login/mobile")]
         public async Task<IActionResult> MobileLogin(LoginCredentials credentials)
-        {
-            try
-            {
-                return Ok(await _authService.MobileLogin(credentials));
-            }
-            catch (BadHttpRequestException e)
-            {
-                return StatusCode(e.StatusCode, new { error = e.Message });
-            }
-        }
+            => Ok(await _authService.MobileLogin(credentials));
 
         [HttpPost("login/web")]
         public async Task<IActionResult> WebLogin(LoginCredentials credentials)
-        {
-            try
-            {
-                return Ok(await _authService.WebLogin(credentials));
-            }
-            catch (BadHttpRequestException e)
-            {
-                return StatusCode(e.StatusCode, new { error = e.Message });
-            }
-        }
+            => Ok(await _authService.WebLogin(credentials));
 
         [Authorize(Policy = "NotBlacklisted")]
         [HttpPost("logout")]

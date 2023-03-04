@@ -46,12 +46,13 @@ namespace Schedule.Utils
                     rootRole
                 );
 
-            var root = new User { 
-                Id = Guid.NewGuid(), 
-                Login = "furlupe", 
+            var root = new User
+            {
+                Id = Guid.NewGuid(),
+                Login = "furlupe",
                 Password = Credentials.EncodePassword(
                     "ilikehex"
-                    ) 
+                    )
             };
             modelBuilder.Entity<User>().HasData(root);
 

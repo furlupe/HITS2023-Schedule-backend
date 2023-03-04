@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Schedule.Enums;
-using Schedule.Exceptions;
-using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Services;
 using Schedule.Utils;
@@ -23,9 +21,7 @@ namespace Schedule.Controllers
         [HttpGet]
         [Authorize(Policy = "NotBlacklisted")]
         public async Task<ActionResult<ICollection<UserInfoDto>>> GetListOfUsers([FromQuery(Name = "role")] ICollection<RoleEnum> roles)
-        {
-            return Ok(await _userService.GetUsers(roles));
-        }
+            => Ok(await _userService.GetUsers(roles));
 
         [HttpGet("me")]
         [Authorize(Policy = "NotBlacklisted")]
@@ -42,16 +38,8 @@ namespace Schedule.Controllers
         [RoleAuthorization(RoleEnum.ADMIN | RoleEnum.ROOT)]
         [Authorize(Policy = "NotBlacklisted")]
         public async Task<ActionResult<UserInfoDto>> GetUser([BindRequired] Guid id)
-        {
-            try
-            {
-                return Ok(await _userService.GetUser(id));
-            }
-            catch (BadHttpRequestException e)
-            {
-                return StatusCode(e.StatusCode, new { error = e.Message });
-            }
-        }
+            => Ok(await _userService.GetUser(id));
+        
 
         [HttpPut("{id}")]
         [RoleAuthorization(RoleEnum.ADMIN | RoleEnum.ROOT)]
@@ -60,26 +48,19 @@ namespace Schedule.Controllers
         {
             var senderRoles = AccessRoles(User.Claims);
 
-            try
+            if (data.Roles.Any(r => r == RoleEnum.ROOT))
             {
-                if (data.Roles.Any(r => r == RoleEnum.ROOT))
-                {
-                    throw new BadHttpRequestException(ErrorStrings.ACCESS_DENIED);
-                }
-
-                if (data.Roles.Any(r => r == RoleEnum.ADMIN) 
-                    && !senderRoles.Contains(RoleEnum.ROOT))
-                {
-                    throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR);
-                }
-
-                await _userService.UpdateUser(id, data);
-                return Ok();
+                throw new BadHttpRequestException(ErrorStrings.ACCESS_DENIED);
             }
-            catch (BadHttpRequestException e)
+
+            if (data.Roles.Any(r => r == RoleEnum.ADMIN)
+                && !senderRoles.Contains(RoleEnum.ROOT))
             {
-                return StatusCode(e.StatusCode, new { error = e.Message });
+                throw new BadHttpRequestException(ErrorStrings.NOT_A_ROOT_ERROR);
             }
+
+            await _userService.UpdateUser(id, data);
+            return Ok();
         }
 
         [HttpDelete("{id}")]
@@ -89,15 +70,8 @@ namespace Schedule.Controllers
         {
             var senderRoles = AccessRoles(User.Claims);
 
-            try
-            {
-                await _userService.DeleteUser(id, senderRoles);
-                return Ok();
-            }
-            catch (BadHttpRequestException e)
-            {
-                return StatusCode(e.StatusCode, new { error = e.Message });
-            }
+            await _userService.DeleteUser(id, senderRoles);
+            return Ok();
         }
 
         private List<RoleEnum> AccessRoles(IEnumerable<Claim> claims)

@@ -1,11 +1,11 @@
-﻿using Schedule.Models.DTO;
+﻿using Microsoft.EntityFrameworkCore;
 using Schedule.Models;
+using Schedule.Models.DTO;
 using Schedule.Utils;
-using Microsoft.EntityFrameworkCore;
 
 namespace Schedule.Services
 {
-    public class LessonService: ILessonService
+    public class LessonService : ILessonService
     {
         private readonly ApplicationContext _context;
 
@@ -16,31 +16,31 @@ namespace Schedule.Services
 
         public async Task CreateLesson(LessonCreateDTO lesson)
         {
-            List<Group> groups= new List<Group>();
+            List<Group> groups = new List<Group>();
             foreach (var num in lesson.GroupsNum)
             {
-                groups.Add(await _context.Groups.FirstOrDefaultAsync(x=> x.Number== num));
+                groups.Add(await _context.Groups.FirstOrDefaultAsync(x => x.Number == num));
             }
             await _context.Lessons.AddAsync(new Lesson
             {
                 Date = lesson.Date,
-                Timeslot = await _context.Timeslots.FirstOrDefaultAsync(x=>x.Id == lesson.TimeslotId),
-                Cabinet = await _context.Cabinets.FirstOrDefaultAsync(x=>x.Number == lesson.CabinetNum),
+                Timeslot = await _context.Timeslots.FirstOrDefaultAsync(x => x.Id == lesson.TimeslotId),
+                Cabinet = await _context.Cabinets.FirstOrDefaultAsync(x => x.Number == lesson.CabinetNum),
                 Groups = groups,
-                Subject = await _context.Subjects.FirstOrDefaultAsync(x=>x.Id == lesson.SubjectId),
-                Teacher = await _context.Teachers.FirstOrDefaultAsync(x=>x.Id == lesson.TeacherId)
+                Subject = await _context.Subjects.FirstOrDefaultAsync(x => x.Id == lesson.SubjectId),
+                Teacher = await _context.Teachers.FirstOrDefaultAsync(x => x.Id == lesson.TeacherId)
             });
             await _context.SaveChangesAsync();
         }
 
         public async Task EditLesson(LessonCreateDTO lesson, Guid id)
         {
-            List<Group> groups= new List<Group>();
+            List<Group> groups = new List<Group>();
             foreach (var num in lesson.GroupsNum)
             {
-                groups.Add(await _context.Groups.FirstOrDefaultAsync(x=>x.Number== num));
+                groups.Add(await _context.Groups.FirstOrDefaultAsync(x => x.Number == num));
             }
-            var thisLesson = await _context.Lessons.FirstOrDefaultAsync(x=> x.Id == id); 
+            var thisLesson = await _context.Lessons.FirstOrDefaultAsync(x => x.Id == id);
             if (thisLesson == null)
             {
                 //TODO: Exeption
@@ -55,11 +55,11 @@ namespace Schedule.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteLesson (Guid id)
+        public async Task DeleteLesson(Guid id)
         {
-            var lesson = await _context.Lessons.FirstOrDefaultAsync (x => x.Id == id);
+            var lesson = await _context.Lessons.FirstOrDefaultAsync(x => x.Id == id);
             _context.Lessons.Remove(lesson);
             await _context.SaveChangesAsync();
-        }   
+        }
     }
 }
