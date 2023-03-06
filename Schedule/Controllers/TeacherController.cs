@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Schedule.Models.DTO;
+using Schedule.Services;
 
 namespace Schedule.Controllers
 {
@@ -7,19 +9,24 @@ namespace Schedule.Controllers
     [Route("teachers")]
     public class TeacherController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult GetAllTeachers()
+        private readonly ITeacherService _teacherService;
+        public TeacherController(ITeacherService teacherService)
         {
-            return Ok();
+            _teacherService = teacherService;
+        }
+        [HttpGet]
+        public async Task<ActionResult<List<TeacherDTO>>> GetAllTeachers()
+        {
+            return await _teacherService.GetAllTeachers();
         }
 
         [HttpGet("{id}/schedule")]
-        public IActionResult GetTeacherSchedule(
+        public async Task<ActionResult<List<LessonDTO>>> GetTeacherSchedule(
             [BindRequired] Guid id,
             [BindRequired] DateTime startsAt,
             [BindRequired] DateTime endsAt)
         {
-            return Ok();
+            return await _teacherService.GetSchedule(id, startsAt, endsAt);
         }
 
     }
