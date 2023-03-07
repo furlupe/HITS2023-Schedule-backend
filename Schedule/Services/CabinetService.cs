@@ -4,7 +4,7 @@ using Schedule.Utils;
 
 namespace Schedule.Services
 {
-    /*public class CabinetService : ICabinetService
+    public class CabinetService : ICabinetService
     {
         private readonly ApplicationContext _context;
 
@@ -24,7 +24,7 @@ namespace Schedule.Services
             return response;
         }
 
-        public async Task<List<LessonDTO>> GetSchedule(int num, TimeOnly start, TimeOnly ends)
+        public async Task<List<LessonDTO>> GetSchedule(int num, DateTime start, DateTime ends)
         {
             var response = new List<LessonDTO>();
             var lessons = await _context.Lessons.
@@ -33,7 +33,11 @@ namespace Schedule.Services
                 Include(th => th.Teacher).
                 Include(gr => gr.Groups).
                 Include(ts => ts.Timeslot).
-                Where(x => x.Cabinet.Number == num && x.Timeslot.StartsAt >= start && x.Timeslot.EndsAt <= ends).ToListAsync();
+                Where(x => x.Cabinet.Number == num && 
+                    x.DateFrom.ToDateTime(new TimeOnly(0, 0)) >= start &&
+                    x.DateUntil.ToDateTime(new TimeOnly(0, 0)) <= ends)
+                .ToListAsync();
+
             foreach (var lesson in lessons)
             {
                 List<int> groups = new List<int>();
@@ -58,5 +62,5 @@ namespace Schedule.Services
             }
             return response;
         }
-    }*/
+    }
 }
