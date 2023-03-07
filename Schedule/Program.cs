@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Schedule.Middlewares;
-using Schedule.Resources;
 using Schedule.Services;
 using Schedule.Utils;
 
@@ -63,7 +61,6 @@ builder.Services.AddScoped<IRandomStringGenerator, RandomStringGenerator>();
 builder.Services.AddTransient<IAuthorizationHandler, BlacklistAuthRequirementHandler>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
-builder.Services.AddScoped<IResource, DbResource>();
 //builder.Services.AddTransient<ICabinetService, CabinetService>();
 
 builder.Services.AddAuthorization(options =>
