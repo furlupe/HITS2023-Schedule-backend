@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Schedule.Utils;
@@ -11,9 +12,11 @@ using Schedule.Utils;
 namespace Schedule.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20230307111027_ChangedDateType")]
+    partial class ChangedDateType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,8 +57,8 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            RolesId = new Guid("edb3e326-822a-4235-9e50-20ca33eddcaf"),
-                            UsersId = new Guid("a5844d3c-5e45-41dc-b2a3-7c3fea0b129b")
+                            RolesId = new Guid("914867e9-db1a-4423-b477-8d50c7b0f935"),
+                            UsersId = new Guid("19108dbb-6b9c-41a7-a44f-493f9cc40250")
                         });
                 });
 
@@ -229,27 +232,27 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a606bcb9-ef5d-4fb9-9ab2-11245b0b4489"),
+                            Id = new Guid("f3346948-f7f1-46dd-8211-3e36221ef236"),
                             Value = 0
                         },
                         new
                         {
-                            Id = new Guid("3c432470-7266-4bbc-a10a-961b6d132b48"),
+                            Id = new Guid("d90d5c82-da4a-4cca-85b6-84c57c54c2ee"),
                             Value = 1
                         },
                         new
                         {
-                            Id = new Guid("1ca1b708-4bd7-4b07-8f2c-4998cd4310b9"),
+                            Id = new Guid("d0a77a2a-2653-4fba-9181-8e5f8181147d"),
                             Value = 2
                         },
                         new
                         {
-                            Id = new Guid("69f3fc9e-30cf-4e46-9b2e-bee6b8f694d9"),
+                            Id = new Guid("79aec46f-784b-46a1-b2f6-36a488643476"),
                             Value = 3
                         },
                         new
                         {
-                            Id = new Guid("edb3e326-822a-4235-9e50-20ca33eddcaf"),
+                            Id = new Guid("914867e9-db1a-4423-b477-8d50c7b0f935"),
                             Value = 4
                         });
                 });
@@ -276,22 +279,22 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7ec55c59-4f23-454f-b097-1c1f75946b0d"),
+                            Id = new Guid("9dc14821-55d7-441b-8e2c-4035a2eb4686"),
                             Name = "Albebra"
                         },
                         new
                         {
-                            Id = new Guid("7962e889-11ef-470f-8dbe-9b44db038872"),
+                            Id = new Guid("693bf5ab-830c-40a0-9069-cb43cca4cb91"),
                             Name = "English language"
                         },
                         new
                         {
-                            Id = new Guid("7ffb507b-2654-472f-9bfb-5e16835c7248"),
+                            Id = new Guid("da6c8174-7392-4371-9a72-4539c1a17a9b"),
                             Name = "Programming"
                         },
                         new
                         {
-                            Id = new Guid("9a8453e9-856c-43ad-aea8-864cd23794dd"),
+                            Id = new Guid("29547970-f9c3-419b-804e-c6080816cbe1"),
                             Name = "Amogusing"
                         });
                 });
@@ -313,12 +316,12 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1051c382-e266-438a-be89-00545f9f62ad"),
+                            Id = new Guid("37ccbbc8-4794-4035-a998-722374e97b35"),
                             Name = "Amogus Ballser"
                         },
                         new
                         {
-                            Id = new Guid("f38883bf-5318-40dd-9285-ba6eec92bf92"),
+                            Id = new Guid("c7e3660b-f8b5-43e6-a691-7e98c01548ad"),
                             Name = "Name Name Teacher"
                         });
                 });
@@ -338,26 +341,6 @@ namespace Schedule.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Timeslots");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("c0faa090-ecd8-42e8-8754-586f36b47942"),
-                            EndsAt = new TimeOnly(10, 20, 0),
-                            StartsAt = new TimeOnly(8, 45, 0)
-                        },
-                        new
-                        {
-                            Id = new Guid("63b22dba-2c5f-4ef6-b17b-40996d88fb47"),
-                            EndsAt = new TimeOnly(12, 10, 0),
-                            StartsAt = new TimeOnly(10, 35, 0)
-                        },
-                        new
-                        {
-                            Id = new Guid("009e4697-aed8-4a81-9d09-76e301fddd0f"),
-                            EndsAt = new TimeOnly(14, 0, 0),
-                            StartsAt = new TimeOnly(12, 25, 0)
-                        });
                 });
 
             modelBuilder.Entity("Schedule.Models.User", b =>
@@ -394,7 +377,7 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a5844d3c-5e45-41dc-b2a3-7c3fea0b129b"),
+                            Id = new Guid("19108dbb-6b9c-41a7-a44f-493f9cc40250"),
                             Login = "furlupe",
                             Password = "3414A9BE42AE5049DD6DBEE1E2C70A986C2E5C20B6E7BF3DDA103678FDDAA7DB"
                         });

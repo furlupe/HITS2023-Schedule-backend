@@ -4,7 +4,7 @@ using Schedule.Utils;
 
 namespace Schedule.Services
 {
-    public class CabinetService : ICabinetService
+    /*public class CabinetService : ICabinetService
     {
         private readonly ApplicationContext _context;
 
@@ -24,7 +24,7 @@ namespace Schedule.Services
             return response;
         }
 
-        public async Task<List<LessonDTO>> GetSchedule(int num, DateTime start, DateTime ends)
+        public async Task<List<LessonDTO>> GetSchedule(int num, TimeOnly start, TimeOnly ends)
         {
             var response = new List<LessonDTO>();
             var lessons = await _context.Lessons.
@@ -58,5 +58,5 @@ namespace Schedule.Services
             }
             return response;
         }
-    }
+    }*/
 }

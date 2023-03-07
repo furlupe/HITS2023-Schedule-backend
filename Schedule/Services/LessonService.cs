@@ -16,50 +16,81 @@ namespace Schedule.Services
 
         public async Task CreateLesson(LessonCreateDTO lesson)
         {
-            List<Group> groups = new List<Group>();
-            foreach (var num in lesson.GroupsNum)
+            var teacher = await _context.Teachers.SingleOrDefaultAsync(t => t.Id == lesson.Teacher) 
+                ?? throw new BadHttpRequestException("No such teacher");
+
+            var subject = await _context.Subjects.SingleOrDefaultAsync(s => s.Id == lesson.Subject) 
+                ?? throw new BadHttpRequestException("No such subject");
+
+            var cabinet = await _context.Cabinets.SingleOrDefaultAsync(c => c.Number == lesson.Cabinet)
+                ?? throw new BadHttpRequestException("No such cabinet");
+
+            var timeslot = await _context.Timeslots.SingleOrDefaultAsync(t => t.Id == lesson.Timeslot)
+                ?? throw new BadHttpRequestException("No such timeslot");
+
+            var groups = await _context.Groups.Where(g => lesson.Groups.Contains(g.Number)).ToListAsync();
+
+            var unaddedGroups = lesson.Groups.Except(groups.Select(g => g.Number));
+
+            if (unaddedGroups.Any())
             {
-                groups.Add(await _context.Groups.FirstOrDefaultAsync(x => x.Number == num));
+                throw new BadHttpRequestException("No such groups with ids:");
             }
-            await _context.Lessons.AddAsync(new Lesson
+
+            var lessonPeriod = new Period(lesson.StartsAt, lesson.EndsAt);
+            foreach(var l in await _context.Lessons
+                .Where(l => 
+                    l.Day == lesson.Day && 
+                    l.Cabinet.Number == lesson.Cabinet && 
+                    l.Timeslot == timeslot)
+                .ToListAsync())
             {
-                Date = lesson.Date,
-                Timeslot = await _context.Timeslots.FirstOrDefaultAsync(x => x.Id == lesson.TimeslotId),
-                Cabinet = await _context.Cabinets.FirstOrDefaultAsync(x => x.Number == lesson.CabinetNum),
+                if (!lessonPeriod.IntersetsWith(new Period(l.DateFrom, l.DateUntil))) continue;
+
+                throw new BadHttpRequestException("Pair intersection");
+            }
+
+            var newLesson = new Lesson
+            {
+                Type = lesson.Type,
+                Day = lesson.Day,
+                Teacher = teacher,
                 Groups = groups,
-                Subject = await _context.Subjects.FirstOrDefaultAsync(x => x.Id == lesson.SubjectId),
-                Teacher = await _context.Teachers.FirstOrDefaultAsync(x => x.Id == lesson.TeacherId)
-            });
+                Subject = subject,
+                Cabinet = cabinet,
+                Timeslot = timeslot,
+                DateFrom = DateOnly.FromDateTime(lesson.StartsAt),
+                DateUntil = DateOnly.FromDateTime(lesson.EndsAt)
+            };
+
+            await _context.Lessons.AddAsync(newLesson);
+
+            var startDate = newLesson.DateFrom;
+            while (startDate.DayOfWeek != lesson.Day) 
+            { 
+                startDate = startDate.AddDays(1);
+            }
+
+            for (; startDate <= newLesson.DateUntil; startDate = startDate.AddDays(7))
+            {
+                await _context.ScheduledLessons.AddAsync(new LessonScheduled
+                {
+                    Lesson = newLesson,
+                    Date = startDate
+                });
+            }
             await _context.SaveChangesAsync();
         }
 
         public async Task EditLesson(LessonCreateDTO lesson, Guid id)
         {
-            List<Group> groups = new List<Group>();
-            foreach (var num in lesson.GroupsNum)
-            {
-                groups.Add(await _context.Groups.FirstOrDefaultAsync(x => x.Number == num));
-            }
-            var thisLesson = await _context.Lessons.FirstOrDefaultAsync(x => x.Id == id);
-            if (thisLesson == null)
-            {
-                //TODO: Exeption
-            }
-            thisLesson.Date = lesson.Date;
-            thisLesson.Timeslot = await _context.Timeslots.FirstOrDefaultAsync(x => x.Id == lesson.TimeslotId);
-            thisLesson.Cabinet = await _context.Cabinets.FirstOrDefaultAsync(x => x.Number == lesson.CabinetNum);
-            thisLesson.Groups = groups;
-            thisLesson.Subject = await _context.Subjects.FirstOrDefaultAsync(x => x.Id == lesson.SubjectId);
-            thisLesson.Teacher = await _context.Teachers.FirstOrDefaultAsync(x => x.Id == lesson.TeacherId);
 
-            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteLesson(Guid id)
         {
-            var lesson = await _context.Lessons.FirstOrDefaultAsync(x => x.Id == id);
-            _context.Lessons.Remove(lesson);
-            await _context.SaveChangesAsync();
+
         }
+
     }
 }

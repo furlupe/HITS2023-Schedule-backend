@@ -61,7 +61,7 @@ builder.Services.AddScoped<IRandomStringGenerator, RandomStringGenerator>();
 builder.Services.AddTransient<IAuthorizationHandler, BlacklistAuthRequirementHandler>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
-builder.Services.AddTransient<ICabinetService, CabinetService>();
+//builder.Services.AddTransient<ICabinetService, CabinetService>();
 
 builder.Services.AddAuthorization(options =>
 {
