@@ -32,7 +32,11 @@ namespace Schedule.Services
         {
             var user = await GetUserByCredentials(credentials);
             if (user is null ||
-                user.Roles.Any(r => r.Value == RoleEnum.STUDENT || r.Value == RoleEnum.TEACHER))
+                !user.Roles.Any(r => 
+                    r.Value == RoleEnum.ADMIN || 
+                    r.Value == RoleEnum.EDITOR ||
+                    r.Value == RoleEnum.ROOT)
+                )
             {
                 throw new BadHttpRequestException(ErrorStrings.INVALID_CREDENTIALS_ERROR);
             }
