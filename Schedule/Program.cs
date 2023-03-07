@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Schedule.Middlewares;
+using Schedule.Resources;
 using Schedule.Services;
 using Schedule.Utils;
 
@@ -16,6 +17,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(option =>
 {
+    option.SchemaFilter<EnumSchemaFilter>();
     option.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
     option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -61,6 +63,7 @@ builder.Services.AddScoped<IRandomStringGenerator, RandomStringGenerator>();
 builder.Services.AddTransient<IAuthorizationHandler, BlacklistAuthRequirementHandler>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
+builder.Services.AddScoped<IResource, DbResource>();
 //builder.Services.AddTransient<ICabinetService, CabinetService>();
 
 builder.Services.AddAuthorization(options =>
