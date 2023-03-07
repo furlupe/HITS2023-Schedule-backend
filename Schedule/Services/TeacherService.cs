@@ -1,33 +1,38 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Schedule.Models.DTO;
 using Schedule.Utils;
+using System;
 
 namespace Schedule.Services
 {
-    public class CabinetService : ICabinetService
+    public class TeacherService: ITeacherService
     {
         private readonly ApplicationContext _context;
 
-        public CabinetService(ApplicationContext context)
+        public TeacherService(ApplicationContext context)
         {
             _context = context;
         }
 
-        public async Task<List<int>> GetAllCabinets()
+        public async Task<List<TeacherDTO>> GetAllTeachers()
         {
-            var response = new List<int>();
-            var cabinetModel = await _context.Cabinets.ToListAsync();
-            foreach (var cabinet in cabinetModel)
+            var response = new List<TeacherDTO>();
+            var teachers = await _context.Teachers.ToListAsync();
+            foreach (var teacher in teachers)
             {
-                response.Add(cabinet.Number);
+                response.Add(new TeacherDTO
+                {
+                    Id= teacher.Id,
+                    Name = teacher.Name
+                });
             }
             return response;
         }
 
-        public async Task<List<LessonDTO>> GetSchedule(int num, DateTime starts, DateTime ends)
+        public async Task<List<LessonDTO>> GetSchedule(Guid id, DateTime start, DateTime end)
         {
-            var startDate = DateOnly.FromDateTime(starts);
-            var endDate = DateOnly.FromDateTime(ends);
+            var startDate = DateOnly.FromDateTime(start);
+            var endDate = DateOnly.FromDateTime(end);
             var response = new List<LessonDTO>();
             var lessons = await _context.Lessons.
                 Include(cab => cab.Cabinet).
@@ -35,11 +40,9 @@ namespace Schedule.Services
                 Include(th => th.Teacher).
                 Include(gr => gr.Groups).
                 Include(ts => ts.Timeslot).
-                Where(x => x.Cabinet.Number == num && 
-                    x.DateFrom >= startDate &&
-                    x.DateUntil <= endDate)
-                .ToListAsync();
-
+                Where(x => x.Teacher.Id == id && 
+                x.DateFrom >= startDate &&
+                    x.DateUntil <= endDate).ToListAsync();
             foreach (var lesson in lessons)
             {
                 List<int> groups = new List<int>();
