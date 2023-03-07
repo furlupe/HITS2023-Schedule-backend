@@ -2,6 +2,7 @@
 using Schedule.Enums;
 using Schedule.Models;
 using Schedule.Models.DTO;
+using Schedule.Resources;
 using Schedule.Utils;
 using System.Data;
 
@@ -9,19 +10,22 @@ namespace Schedule.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly ApplicationContext _context;
+        private readonly IResource _resource;
         private readonly ITokenService _tokenService;
-        public AuthService(ApplicationContext context, ITokenService tokenService)
+        public AuthService(ITokenService tokenService, IResource resource)
         {
-            _context = context;
             _tokenService = tokenService;
+            _resource = resource;
         }
 
         public async Task<TokensDto> MobileLogin(LoginCredentials credentials)
         {
-            var user = await GetUserByCredentials(credentials);
-            if (user is null ||
-                !user.Roles.Any(r => r.Value == RoleEnum.STUDENT || r.Value == RoleEnum.TEACHER))
+            var user = await _resource.GetUserByCredentials(
+                credentials.Login, 
+                Credentials.EncodePassword(credentials.Password)
+                );
+
+            if (!user.Roles.Any(r => r.Value == RoleEnum.STUDENT || r.Value == RoleEnum.TEACHER))
             {
                 throw new BadHttpRequestException(ErrorStrings.INVALID_CREDENTIALS_ERROR);
             }
@@ -30,9 +34,16 @@ namespace Schedule.Services
         }
         public async Task<TokensDto> WebLogin(LoginCredentials credentials)
         {
-            var user = await GetUserByCredentials(credentials);
-            if (user is null ||
-                user.Roles.Any(r => r.Value == RoleEnum.STUDENT || r.Value == RoleEnum.TEACHER))
+            var user = await _resource.GetUserByCredentials(
+                credentials.Login,
+                Credentials.EncodePassword(credentials.Password)
+                );
+
+            if (!user.Roles.Any(r => 
+                    r.Value == RoleEnum.ADMIN || 
+                    r.Value == RoleEnum.EDITOR ||
+                    r.Value == RoleEnum.ROOT)
+                )
             {
                 throw new BadHttpRequestException(ErrorStrings.INVALID_CREDENTIALS_ERROR);
             }
@@ -42,18 +53,12 @@ namespace Schedule.Services
 
         public async Task Logout(string token)
         {
-            await _context.Blacklist.AddAsync(new BlacklistedToken
-            {
-                Value = token
-            });
-
-            await _context.SaveChangesAsync();
+            await _resource.AddBlacklistedToken(new BlacklistedToken { Value = token });
         }
 
         public async Task Register(RegistrationDTO user)
         {
-            var group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == user.GroupNumber);
-
+            var group = await _resource.GetGroup(user.GroupNumber);
             if (user.Roles.Any(r => r == RoleEnum.STUDENT) && group is null)
             {
                 throw new BadHttpRequestException(
@@ -61,8 +66,7 @@ namespace Schedule.Services
                     );
             }
 
-            var teacher = await _context.Teachers.SingleOrDefaultAsync(t => t.Id == user.TeacherID);
-
+            var teacher = await _resource.GetTeacher(user.TeacherID);
             if (user.Roles.Any(r => r == RoleEnum.TEACHER) && teacher is null)
             {
                 throw new BadHttpRequestException(
@@ -71,21 +75,21 @@ namespace Schedule.Services
             }
 
             if (user.Roles.Any(r => r == RoleEnum.TEACHER) &&
-                await _context.Users.AnyAsync(u => u.TeacherProfile == teacher))
+                await _resource.DoesTeacherAccountExist(teacher))
             {
                 throw new BadHttpRequestException(
                     string.Format(ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR, user.TeacherID)
                     );
             }
 
-            if (await _context.Users.AnyAsync(u => u.Login == user.Login))
+            if (await _resource.IsLoginTaken(user.Login))
             {
                 throw new BadHttpRequestException(ErrorStrings.LOGIN_TAKEN_ERROR, StatusCodes.Status409Conflict);
             }
 
-            var roles = await _context.Roles.Where(r => user.Roles.Contains(r.Value)).ToListAsync();
+            var roles = await _resource.GetRoles(user.Roles);
 
-            await _context.Users.AddAsync(new User
+            await _resource.AddUser(new User
             {
                 Login = user.Login,
                 Password = Credentials.EncodePassword(user.Password),
@@ -94,17 +98,13 @@ namespace Schedule.Services
                 Group = group
             });
 
-            await _context.SaveChangesAsync();
         }
 
         public async Task<TokensDto> Refresh(string token)
         {
-            var rt = await _context.RefreshTokens
-                .Include(t => t.User)
-                    .ThenInclude(u => u.Roles)
-                .SingleOrDefaultAsync(t => t.Value == token);
+            var rt = await _resource.GetRefreshToken(token);
 
-            if (rt is null || rt.Expiry < DateTime.UtcNow)
+            if (rt.Expiry < DateTime.UtcNow)
             {
                 throw new BadHttpRequestException(string.Empty, StatusCodes.Status401Unauthorized);
             }
@@ -112,17 +112,10 @@ namespace Schedule.Services
             return await Login(rt.User);
         }
 
-        private async Task<User?> GetUserByCredentials(LoginCredentials credentials)
-        {
-            var hashedPassword = Credentials.EncodePassword(credentials.Password);
-            return await _context.Users
-                .Include(u => u.Roles)
-                .SingleOrDefaultAsync(u => u.Login == credentials.Login && u.Password == hashedPassword);
-        }
         private async Task<TokensDto> Login(User user)
         {
             var refreshToken = _tokenService.CreateRefreshToken();
-            var rtUser = await _context.RefreshTokens.SingleOrDefaultAsync(u => u.User == user);
+            var rtUser = await _resource.GetRefreshTokenByUser(user);
 
             var response = new TokensDto
             {
@@ -132,17 +125,15 @@ namespace Schedule.Services
 
             if (rtUser is not null)
             {
-                _context.RefreshTokens.Remove(rtUser);
+                await _resource.RemoveRefreshToken(rtUser);
             }
 
-            await _context.RefreshTokens.AddAsync(new RefreshToken
+            await _resource.AddRefreshToken(new RefreshToken
             {
                 Value = refreshToken,
                 User = user,
                 Expiry = DateTime.UtcNow.AddDays(60)
             });
-
-            await _context.SaveChangesAsync();
 
             return response;
         }

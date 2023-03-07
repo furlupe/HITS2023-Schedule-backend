@@ -165,4 +165,16 @@
   <data name="ROOT_GIVEN_ERROR" xml:space="preserve">
     <value>Can't register a new ROOT</value>
   </data>
+  <data name="CABINET_WRONG_ID_ERROR" xml:space="preserve">
+    <value>Cabinet w/ id = {0} does not exist</value>
+  </data>
+  <data name="SUBJECT_WRONG_ID_ERROR" xml:space="preserve">
+    <value>Subject w/ id = {0} does not exist</value>
+  </data>
+  <data name="TIMESLOT_WRONG_ID_ERROR" xml:space="preserve">
+    <value>Timeslot w/ id = {0} does not exist</value>
+  </data>
+  <data name="WRONG_GROUPS_ID_ERROR" xml:space="preserve">
+    <value>No groups with ids = {0}</value>
+  </data>
 </root>
