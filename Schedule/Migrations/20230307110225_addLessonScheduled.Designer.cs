@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Schedule.Utils;
@@ -11,9 +12,11 @@ using Schedule.Utils;
 namespace Schedule.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20230307110225_addLessonScheduled")]
+    partial class addLessonScheduled
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,8 +57,8 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            RolesId = new Guid("edb3e326-822a-4235-9e50-20ca33eddcaf"),
-                            UsersId = new Guid("a5844d3c-5e45-41dc-b2a3-7c3fea0b129b")
+                            RolesId = new Guid("7e8d7c21-a3a7-4f72-8ee9-76454f26b1aa"),
+                            UsersId = new Guid("dfa8d2fc-5391-45f5-b066-b89bdba4ee45")
                         });
                 });
 
@@ -142,11 +145,11 @@ namespace Schedule.Migrations
                     b.Property<int>("CabinetNumber")
                         .HasColumnType("integer");
 
-                    b.Property<DateOnly>("DateFrom")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("DateFrom")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateOnly>("DateUntil")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("DateUntil")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Day")
                         .HasColumnType("integer");
@@ -182,8 +185,8 @@ namespace Schedule.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("LessonId")
                         .HasColumnType("uuid");
@@ -229,27 +232,27 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a606bcb9-ef5d-4fb9-9ab2-11245b0b4489"),
+                            Id = new Guid("0faef7db-cbc9-41c2-b18e-3a35e3727c4e"),
                             Value = 0
                         },
                         new
                         {
-                            Id = new Guid("3c432470-7266-4bbc-a10a-961b6d132b48"),
+                            Id = new Guid("c44ab5bd-d888-4659-b93b-703e9cf43a1d"),
                             Value = 1
                         },
                         new
                         {
-                            Id = new Guid("1ca1b708-4bd7-4b07-8f2c-4998cd4310b9"),
+                            Id = new Guid("cadd7bef-1d2d-47d3-8cee-154d410660e9"),
                             Value = 2
                         },
                         new
                         {
-                            Id = new Guid("69f3fc9e-30cf-4e46-9b2e-bee6b8f694d9"),
+                            Id = new Guid("1833ad80-472a-4fcd-a79d-64f2b343ae12"),
                             Value = 3
                         },
                         new
                         {
-                            Id = new Guid("edb3e326-822a-4235-9e50-20ca33eddcaf"),
+                            Id = new Guid("7e8d7c21-a3a7-4f72-8ee9-76454f26b1aa"),
                             Value = 4
                         });
                 });
@@ -276,22 +279,22 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7ec55c59-4f23-454f-b097-1c1f75946b0d"),
+                            Id = new Guid("4fdb81fd-c8ac-4b97-858a-11960dafcc8b"),
                             Name = "Albebra"
                         },
                         new
                         {
-                            Id = new Guid("7962e889-11ef-470f-8dbe-9b44db038872"),
+                            Id = new Guid("79af4be6-0ecc-4252-a699-6f6a7b81e7df"),
                             Name = "English language"
                         },
                         new
                         {
-                            Id = new Guid("7ffb507b-2654-472f-9bfb-5e16835c7248"),
+                            Id = new Guid("7cced983-dcda-4627-848e-3dd678b6646a"),
                             Name = "Programming"
                         },
                         new
                         {
-                            Id = new Guid("9a8453e9-856c-43ad-aea8-864cd23794dd"),
+                            Id = new Guid("058ef1e1-4530-4de9-a48a-a93e57bf168c"),
                             Name = "Amogusing"
                         });
                 });
@@ -313,12 +316,12 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1051c382-e266-438a-be89-00545f9f62ad"),
+                            Id = new Guid("33d75289-4a7e-495b-9ae0-67e4dcb4e42b"),
                             Name = "Amogus Ballser"
                         },
                         new
                         {
-                            Id = new Guid("f38883bf-5318-40dd-9285-ba6eec92bf92"),
+                            Id = new Guid("3066925f-cd00-418d-bbe4-6948c2cdaf6a"),
                             Name = "Name Name Teacher"
                         });
                 });
@@ -329,35 +332,15 @@ namespace Schedule.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<TimeOnly>("EndsAt")
-                        .HasColumnType("time without time zone");
+                    b.Property<DateTime>("EndsAt")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<TimeOnly>("StartsAt")
-                        .HasColumnType("time without time zone");
+                    b.Property<DateTime>("StartsAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.ToTable("Timeslots");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("c0faa090-ecd8-42e8-8754-586f36b47942"),
-                            EndsAt = new TimeOnly(10, 20, 0),
-                            StartsAt = new TimeOnly(8, 45, 0)
-                        },
-                        new
-                        {
-                            Id = new Guid("63b22dba-2c5f-4ef6-b17b-40996d88fb47"),
-                            EndsAt = new TimeOnly(12, 10, 0),
-                            StartsAt = new TimeOnly(10, 35, 0)
-                        },
-                        new
-                        {
-                            Id = new Guid("009e4697-aed8-4a81-9d09-76e301fddd0f"),
-                            EndsAt = new TimeOnly(14, 0, 0),
-                            StartsAt = new TimeOnly(12, 25, 0)
-                        });
                 });
 
             modelBuilder.Entity("Schedule.Models.User", b =>
@@ -394,7 +377,7 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a5844d3c-5e45-41dc-b2a3-7c3fea0b129b"),
+                            Id = new Guid("dfa8d2fc-5391-45f5-b066-b89bdba4ee45"),
                             Login = "furlupe",
                             Password = "3414A9BE42AE5049DD6DBEE1E2C70A986C2E5C20B6E7BF3DDA103678FDDAA7DB"
                         });

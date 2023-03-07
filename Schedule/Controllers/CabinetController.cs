@@ -5,6 +5,7 @@ using Schedule.Services;
 
 namespace Schedule.Controllers
 {
+    // not working rn, service is disabled
     [ApiController]
     [Route("cabinets")]
     public class CabinetController : ControllerBase

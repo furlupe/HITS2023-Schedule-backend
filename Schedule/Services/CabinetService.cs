@@ -33,7 +33,11 @@ namespace Schedule.Services
                 Include(th => th.Teacher).
                 Include(gr => gr.Groups).
                 Include(ts => ts.Timeslot).
-                Where(x => x.Cabinet.Number == num && x.Timeslot.StartsAt >= start && x.Timeslot.EndsAt <= ends).ToListAsync();
+                Where(x => x.Cabinet.Number == num && 
+                    x.DateFrom.ToDateTime(new TimeOnly(0, 0)) >= start &&
+                    x.DateUntil.ToDateTime(new TimeOnly(0, 0)) <= ends)
+                .ToListAsync();
+
             foreach (var lesson in lessons)
             {
                 List<int> groups = new List<int>();

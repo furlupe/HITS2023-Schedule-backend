@@ -79,6 +79,15 @@ namespace Schedule {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cabinet w/ id = {0} does not exist.
+        /// </summary>
+        public static string CABINET_WRONG_ID_ERROR {
+            get {
+                return ResourceManager.GetString("CABINET_WRONG_ID_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Editor\\admin given, yet group id was provided.
         /// </summary>
         public static string EDITOR_ADMIN_GROUP_GIVEN_ERROR {
@@ -160,6 +169,15 @@ namespace Schedule {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Subject w/ id = {0} does not exist.
+        /// </summary>
+        public static string SUBJECT_WRONG_ID_ERROR {
+            get {
+                return ResourceManager.GetString("SUBJECT_WRONG_ID_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to There&apos;s already an account for teacher w/ id = {0}.
         /// </summary>
         public static string TEACHER_ACCOUNT_EXISTS_ERROR {
@@ -196,11 +214,29 @@ namespace Schedule {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Timeslot w/ id = {0} does not exist.
+        /// </summary>
+        public static string TIMESLOT_WRONG_ID_ERROR {
+            get {
+                return ResourceManager.GetString("TIMESLOT_WRONG_ID_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User w/ id = {0} does not exist.
         /// </summary>
         public static string USER_WRONG_ID_ERROR {
             get {
                 return ResourceManager.GetString("USER_WRONG_ID_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No groups with ids = {0}.
+        /// </summary>
+        public static string WRONG_GROUPS_ID_ERROR {
+            get {
+                return ResourceManager.GetString("WRONG_GROUPS_ID_ERROR", resourceCulture);
             }
         }
     }

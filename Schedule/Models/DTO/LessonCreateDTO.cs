@@ -1,20 +1,28 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Schedule.Enums;
+using Schedule.Utils;
+using System.ComponentModel.DataAnnotations;
 
 namespace Schedule.Models.DTO
 {
     public class LessonCreateDTO
     {
         [Required]
-        public Guid TeacherId { get; set; }
+        public Guid Teacher { get; set; }
         [Required]
-        public Guid SubjectId { get; set; }
+        public Guid Subject { get; set; }
         [Required]
-        public List<int> GroupsNum { get; set; }
+        public List<int> Groups { get; set; }
         [Required]
-        public int CabinetNum { get; set; }
+        public int Cabinet { get; set; }
         [Required]
-        public Guid TimeslotId { get; set; }
+        public Guid Timeslot { get; set; }
         [Required]
-        public DateTime Date { get; set; }
+        public DayOfWeek Day { get; set; }
+        [Required]
+        public LessonType Type { get; set; }
+        [Required]
+        public DateTime StartsAt { get; set; }
+        [Required]
+        public DateTime EndsAt { get; set; }
     }
 }
