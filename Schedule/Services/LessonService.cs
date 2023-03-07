@@ -1,27 +1,39 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Schedule.Models;
 using Schedule.Models.DTO;
-using Schedule.Resources;
 using Schedule.Utils;
 
 namespace Schedule.Services
 {
     public class LessonService : ILessonService
     {
-        private readonly IResource _resource;
+        private readonly ApplicationContext _context;
 
-        public LessonService(IResource resource)
+        public LessonService(ApplicationContext context)
         {
-            _resource = resource;
+            _context = context;
         }
 
         public async Task CreateLesson(LessonCreateDTO lesson)
         {
-            var teacher = await _resource.GetTeacher(lesson.Teacher);
-            var subject = await _resource.GetSubject(lesson.Subject);
-            var cabinet = await _resource.GetCabinet(lesson.Cabinet);
-            var timeslot = await _resource.GetTimeslot(lesson.Timeslot);
-            var groups = await _resource.GetGroups(lesson.Groups);
+            var teacher = await _context.Teachers.SingleOrDefaultAsync(t => t.Id == lesson.Teacher)
+                ?? throw new BadHttpRequestException("No such teacher");
+
+            var subject = await _context.Subjects.SingleOrDefaultAsync(s => s.Id == lesson.Subject)
+                ?? throw new BadHttpRequestException("No such subject");
+
+            var cabinet = await _context.Cabinets.SingleOrDefaultAsync(c => c.Number == lesson.Cabinet)
+                ?? throw new BadHttpRequestException("No such cabinet");
+
+            var timeslot = await _context.Timeslots.SingleOrDefaultAsync(t => t.Id == lesson.Timeslot)
+                ?? throw new BadHttpRequestException("No such timeslot");
+
+            var groups = await _context.Groups.Where(g => lesson.Groups.Contains(g.Number)).ToListAsync();
+            var unaddedGroups = lesson.Groups.Except(groups.Select(g => g.Number));
+            if (unaddedGroups.Any())
+            {
+                throw new BadHttpRequestException("No such groups with ids:");
+            }
 
             var newLesson = new Lesson
             {
@@ -36,10 +48,12 @@ namespace Schedule.Services
                 DateUntil = DateOnly.FromDateTime(lesson.EndsAt)
             };
 
-            if (await LessonIntersects(newLesson)) 
+            if (await LessonIntersects(newLesson))
                 throw new BadHttpRequestException("Lesson intersects");
 
-            await _resource.AddLesson(newLesson);
+
+            await _context.Lessons.AddAsync(newLesson);
+            await _context.SaveChangesAsync();
             await ScheduleLessons(newLesson);
         }
 
@@ -56,7 +70,12 @@ namespace Schedule.Services
         private async Task<bool> LessonIntersects(Lesson lesson)
         {
             var lessonPeriod = new Period(lesson.DateFrom, lesson.DateUntil);
-            foreach (var l in await _resource.GetSimilarLessons(lesson))
+            foreach (var l in await _context.Lessons
+                .Where(l =>
+                    l.Day == lesson.Day &&
+                    l.Cabinet == lesson.Cabinet &&
+                    l.Timeslot == lesson.Timeslot)
+                .ToListAsync())
             {
                 if (!lessonPeriod.IntersetsWith(new Period(l.DateFrom, l.DateUntil))) continue;
 
@@ -76,7 +95,7 @@ namespace Schedule.Services
             var startDate = GetClosestDateWithDay(lesson.DateFrom, lesson.Day);
             for (; startDate <= lesson.DateUntil; startDate = startDate.AddDays(7))
             {
-                await _resource.ScheduleLesson(new LessonScheduled
+                await _context.ScheduledLessons.AddAsync(new LessonScheduled
                 {
                     Lesson = lesson,
                     Date = startDate
