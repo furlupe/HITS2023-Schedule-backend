@@ -6,8 +6,8 @@
         public CabinetDTO Cabinet { get; set; }
         public List<int> GroupsNum { get; set; }
         public string Teacher { get; set; }
-        public TimeOnly Start { get; set; }
-        public TimeOnly End { get; set; }
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
 
     }
 }

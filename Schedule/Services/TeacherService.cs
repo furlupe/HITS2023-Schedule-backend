@@ -31,6 +31,8 @@ namespace Schedule.Services
 
         public async Task<List<LessonDTO>> GetSchedule(Guid id, DateTime start, DateTime end)
         {
+            var startDate = DateOnly.FromDateTime(start);
+            var endDate = DateOnly.FromDateTime(end);
             var response = new List<LessonDTO>();
             var lessons = await _context.Lessons.
                 Include(cab => cab.Cabinet).
@@ -38,7 +40,9 @@ namespace Schedule.Services
                 Include(th => th.Teacher).
                 Include(gr => gr.Groups).
                 Include(ts => ts.Timeslot).
-                Where(x => x.Teacher.Id == id && x.Timeslot.StartsAt >= start && x.Timeslot.EndsAt <= end).ToListAsync();
+                Where(x => x.Teacher.Id == id && 
+                x.DateFrom >= startDate &&
+                    x.DateUntil <= endDate).ToListAsync();
             foreach (var lesson in lessons)
             {
                 List<int> groups = new List<int>();
@@ -47,6 +51,7 @@ namespace Schedule.Services
                     groups.Add(group.Number);
                 }
 
+                var dateReplacemnt = new DateOnly();
                 response.Add(new LessonDTO
                 {
                     Subject = lesson.Subject.Name,
@@ -57,8 +62,8 @@ namespace Schedule.Services
                     },
                     GroupsNum = groups,
                     Teacher = lesson.Teacher.Name,
-                    Start = lesson.Timeslot.StartsAt,
-                    End = lesson.Timeslot.EndsAt
+                    Start = dateReplacemnt.ToDateTime(lesson.Timeslot.StartsAt),
+                    End = dateReplacemnt.ToDateTime(lesson.Timeslot.EndsAt)
                 });
             }
             return response;
