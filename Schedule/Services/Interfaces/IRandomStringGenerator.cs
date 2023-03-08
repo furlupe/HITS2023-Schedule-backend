@@ -1,4 +1,4 @@
-﻿namespace Schedule.Services
+﻿namespace Schedule.Services.Interfaces
 {
     public interface IRandomStringGenerator
     {

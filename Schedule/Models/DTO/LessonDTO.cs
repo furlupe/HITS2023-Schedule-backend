@@ -8,6 +8,6 @@
         public string Teacher { get; set; }
         public TimeslotDTO Timeslot { get; set; }
         public List<int> GroupsNum { get; set; }
-        public DateOnly Date { get; set; }
+        public DateTime Date { get; set; }
     }
 }

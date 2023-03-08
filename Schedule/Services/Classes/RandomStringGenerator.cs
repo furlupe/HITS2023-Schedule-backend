@@ -1,4 +1,6 @@
-﻿namespace Schedule.Services
+﻿using Schedule.Services.Interfaces;
+
+namespace Schedule.Services.Classes
 {
     public class RandomStringGenerator : IRandomStringGenerator
     {

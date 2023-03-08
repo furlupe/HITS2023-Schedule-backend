@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Schedule.Enums;
 using Schedule.Models.DTO;
-using Schedule.Services;
+using Schedule.Services.Interfaces;
+using Schedule.Utils;
+using System.Security.Claims;
 
 namespace Schedule.Controllers
 {
@@ -17,7 +21,21 @@ namespace Schedule.Controllers
         [HttpGet]
         public async Task<ActionResult<List<TeacherDTO>>> GetAllTeachers()
         {
-            return await _teacherService.GetAllTeachers();
+            return Ok(await _teacherService.GetAllTeachers());
+        }
+
+        [HttpGet("me/schedule")]
+        [Authorize(Policy = "NotBlacklisted")]
+        [RoleAuthorization(RoleEnum.TEACHER | RoleEnum.STUDENT)]
+        public async Task<ActionResult<List<LessonDTO>>> GetUserSchedule(
+            [BindRequired] Guid id,
+            [BindRequired] DateTime startsAt,
+            [BindRequired] DateTime endsAt)
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+            Guid.TryParse(userIdClaim.Value, out Guid userId);
+
+            return Ok(await _teacherService.GetSchedule(userId, startsAt, endsAt));
         }
 
         [HttpGet("{id}/schedule")]
@@ -26,7 +44,7 @@ namespace Schedule.Controllers
             [BindRequired] DateTime startsAt,
             [BindRequired] DateTime endsAt)
         {
-            return await _teacherService.GetSchedule(id, startsAt, endsAt);
+            return Ok(await _teacherService.GetSchedule(id, startsAt, endsAt));
         }
 
     }

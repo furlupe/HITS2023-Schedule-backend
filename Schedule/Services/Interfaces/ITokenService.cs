@@ -1,6 +1,6 @@
 ﻿using Schedule.Models;
 
-namespace Schedule.Services
+namespace Schedule.Services.Interfaces
 {
     public interface ITokenService
     {

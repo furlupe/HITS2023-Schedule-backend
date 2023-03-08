@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Schedule.Enums;
 using Schedule.Models.DTO;
-using Schedule.Services;
+using Schedule.Services.Interfaces;
 using Schedule.Utils;
 using System.Security.Claims;
 

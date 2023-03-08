@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Schedule.Models;
 using Schedule.Models.DTO;
+using Schedule.Services.Interfaces;
 using Schedule.Utils;
 
-namespace Schedule.Services
+namespace Schedule.Services.Classes
 {
     public class LessonService : ILessonService
     {
@@ -35,8 +36,8 @@ namespace Schedule.Services
                 ?? throw new BadHttpRequestException("No such timeslot");
 
             if (await _context.ScheduledLessons.AnyAsync(
-                les => 
-                    les.Timeslot == timeslot && 
+                les =>
+                    les.Timeslot == timeslot &&
                     les.Date == DateOnly.FromDateTime(lesson.Date))
                 )
             {
@@ -61,15 +62,15 @@ namespace Schedule.Services
 
             _context.Entry(l).CurrentValues.SetValues(new
             {
-                Timeslot = newLesson.Timeslot,
-                Cabinet = newLesson.Cabinet,
-                Groups = newLesson.Groups,
-                Subject = newLesson.Subject,
-                Teacher = newLesson.Teacher,
-                Day = newLesson.Day,
-                Type = newLesson.Type,
-                DateFrom = newLesson.DateFrom,
-                DateUntil = newLesson.DateUntil
+                newLesson.Timeslot,
+                newLesson.Cabinet,
+                newLesson.Groups,
+                newLesson.Subject,
+                newLesson.Teacher,
+                newLesson.Day,
+                newLesson.Type,
+                newLesson.DateFrom,
+                newLesson.DateUntil
             });
 
             await _context.SaveChangesAsync();

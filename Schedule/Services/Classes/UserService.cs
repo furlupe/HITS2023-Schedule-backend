@@ -2,9 +2,10 @@
 using Schedule.Enums;
 using Schedule.Models;
 using Schedule.Models.DTO;
+using Schedule.Services.Interfaces;
 using Schedule.Utils;
 
-namespace Schedule.Services
+namespace Schedule.Services.Classes
 {
     public class UserService : IUserService
     {
@@ -68,8 +69,8 @@ namespace Schedule.Services
                 Id = user.Id,
                 Login = user.Login,
                 Roles = user.Roles.Select(r => r.Value).ToList(),
-                TeacherId = (user.TeacherProfile is null) ? null : user.TeacherProfile.Id,
-                Group = (user.Group is null) ? null : user.Group.Number
+                TeacherId = user.TeacherProfile is null ? null : user.TeacherProfile.Id,
+                Group = user.Group is null ? null : user.Group.Number
             };
         }
 
