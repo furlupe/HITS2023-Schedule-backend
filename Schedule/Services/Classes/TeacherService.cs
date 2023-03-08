@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Schedule.Models.DTO;
+using Schedule.Services.Interfaces;
 using Schedule.Utils;
 using System;
 
-namespace Schedule.Services
+namespace Schedule.Services.Classes
 {
-    public class TeacherService: ITeacherService
+    public class TeacherService : ITeacherService
     {
         private readonly ApplicationContext _context;
 
@@ -22,7 +23,7 @@ namespace Schedule.Services
             {
                 response.Add(new TeacherDTO
                 {
-                    Id= teacher.Id,
+                    Id = teacher.Id,
                     Name = teacher.Name
                 });
             }
@@ -72,11 +73,12 @@ namespace Schedule.Services
                     Teacher = lesson.Lesson.Teacher.Name,
                     Timeslot = new TimeslotDTO
                     {
-                        startAt =  dateReplacemnt.ToDateTime(lesson.Lesson.Timeslot.StartsAt),
+                        Id = lesson.Lesson.Timeslot.Id,
+                        startAt = dateReplacemnt.ToDateTime(lesson.Lesson.Timeslot.StartsAt),
                         endsAt = dateReplacemnt.ToDateTime(lesson.Lesson.Timeslot.EndsAt)
                     },
                     GroupsNum = groups,
-                    Date = lesson.Date
+                    Date = lesson.Date.ToDateTime(new TimeOnly(0, 0))
                 });
             }
             return response;

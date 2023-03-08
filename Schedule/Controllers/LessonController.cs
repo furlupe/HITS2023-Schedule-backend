@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Schedule.Enums;
 using Schedule.Models.DTO;
-using Schedule.Services;
+using Schedule.Services.Interfaces;
 using Schedule.Utils;
 
 namespace Schedule.Controllers

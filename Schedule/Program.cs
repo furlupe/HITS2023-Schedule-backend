@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Schedule.Middlewares;
-using Schedule.Services;
+using Schedule.Services.Classes;
+using Schedule.Services.Interfaces;
 using Schedule.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -61,9 +62,11 @@ builder.Services.AddScoped<IRandomStringGenerator, RandomStringGenerator>();
 builder.Services.AddTransient<IAuthorizationHandler, BlacklistAuthRequirementHandler>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
-builder.Services.AddTransient<ICabinetService, CabinetService>();
-builder.Services.AddTransient<ITeacherService, TeacherService>();
-builder.Services.AddTransient<IGroupService, GroupService>();
+builder.Services.AddTransient<ISubjectService, SubjectService>();
+builder.Services.AddTransient<ITimeslotService, TimeslotService>();
+builder.Services.AddScoped<ICabinetService, CabinetService>();
+builder.Services.AddScoped<ITeacherService, TeacherService>();
+builder.Services.AddScoped<IGroupService, GroupService>();
 
 builder.Services.AddAuthorization(options =>
 {

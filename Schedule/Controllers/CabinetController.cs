@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Schedule.Models.DTO;
-using Schedule.Services;
+using Schedule.Services.Interfaces;
 
 namespace Schedule.Controllers
 {

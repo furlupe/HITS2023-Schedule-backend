@@ -1,10 +1,11 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Schedule.Models;
+using Schedule.Services.Interfaces;
 using Schedule.Utils;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace Schedule.Services
+namespace Schedule.Services.Classes
 {
     public class TokenService : ITokenService
     {

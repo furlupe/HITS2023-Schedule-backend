@@ -1,6 +1,6 @@
 ﻿using Schedule.Models.DTO;
 
-namespace Schedule.Services
+namespace Schedule.Services.Interfaces
 {
     public interface IAuthService
     {

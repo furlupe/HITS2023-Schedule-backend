@@ -2,10 +2,11 @@
 using Schedule.Enums;
 using Schedule.Models;
 using Schedule.Models.DTO;
+using Schedule.Services.Interfaces;
 using Schedule.Utils;
 using System.Data;
 
-namespace Schedule.Services
+namespace Schedule.Services.Classes
 {
     public class AuthService : IAuthService
     {
@@ -32,8 +33,8 @@ namespace Schedule.Services
         {
             var user = await GetUserByCredentials(credentials);
             if (user is null ||
-                !user.Roles.Any(r => 
-                    r.Value == RoleEnum.ADMIN || 
+                !user.Roles.Any(r =>
+                    r.Value == RoleEnum.ADMIN ||
                     r.Value == RoleEnum.EDITOR ||
                     r.Value == RoleEnum.ROOT)
                 )
