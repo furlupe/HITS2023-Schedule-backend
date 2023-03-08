@@ -26,6 +26,12 @@ namespace Schedule.Services
 
         public async Task<List<LessonDTO>> GetSchedule(int num, DateTime starts, DateTime ends)
         {
+            var confir = await _context.Cabinets.FirstOrDefaultAsync(c => c.Number == num);
+            if (confir == null)
+            {
+                throw new BadHttpRequestException(string.Format(ErrorStrings.CABINET_WRONG_ID_ERROR, num),
+                    StatusCodes.Status404NotFound);
+            }
             var startDate = DateOnly.FromDateTime(starts);
             var endDate = DateOnly.FromDateTime(ends);
             var response = new List<LessonDTO>();
