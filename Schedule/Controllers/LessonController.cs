@@ -25,11 +25,19 @@ namespace Schedule.Controllers
             return Ok();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("single/{id}")]
+        [RoleAuthorization(RoleEnum.EDITOR | RoleEnum.ADMIN | RoleEnum.ROOT)]
+        public async Task<IActionResult> UpdateLesson(SingleLessonEditDto lesson, [BindRequired] Guid id)
+        {
+            await _lessonService.EditSingleLesson(lesson, id);
+            return Ok();
+        }
+
+        [HttpPut("all/{id}")]
         [RoleAuthorization(RoleEnum.EDITOR | RoleEnum.ADMIN | RoleEnum.ROOT)]
         public async Task<IActionResult> UpdateLesson(LessonCreateDTO lesson, [BindRequired] Guid id)
         {
-            await _lessonService.EditLesson(lesson, id);
+            await _lessonService.EditAllLessons(lesson, id);
             return Ok();
         }
 

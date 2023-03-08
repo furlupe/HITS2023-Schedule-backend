@@ -1,42 +1,35 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Schedule.Models.DTO;
 using Schedule.Utils;
-using System;
 
 namespace Schedule.Services
 {
-    public class TeacherService: ITeacherService
+    public class GroupService: IGroupService
     {
         private readonly ApplicationContext _context;
-
-        public TeacherService(ApplicationContext context)
+        public GroupService(ApplicationContext context)
         {
             _context = context;
         }
-
-        public async Task<List<TeacherDTO>> GetAllTeachers()
+        public async Task<List<int>> GetAllGroups()
         {
-            var response = new List<TeacherDTO>();
-            var teachers = await _context.Teachers.ToListAsync();
-            foreach (var teacher in teachers)
+            var response = new List<int>();
+            var groups = await _context.Groups.ToListAsync();
+            foreach ( var group in groups)
             {
-                response.Add(new TeacherDTO
-                {
-                    Id= teacher.Id,
-                    Name = teacher.Name
-                });
+                response.Add(group.Number);
             }
             return response;
         }
-
-        public async Task<List<LessonDTO>> GetSchedule(Guid id, DateTime start, DateTime end)
+        public async Task<List<LessonDTO>> GetSchedule(int num, DateTime start, DateTime end)
         {
-            var confir = await _context.Teachers.FirstOrDefaultAsync(c => c.Id == id);
+            var confir = await _context.Groups.FirstOrDefaultAsync(c => c.Number == num);
             if (confir == null)
             {
-                throw new BadHttpRequestException(string.Format(ErrorStrings.TEACHER_WRONG_ID_ERROR, id),
+                throw new BadHttpRequestException(string.Format(ErrorStrings.GROUP_WRONG_ID_ERROR, num),
                     StatusCodes.Status404NotFound);
             }
+            var thisGroup = await _context.Groups.FirstOrDefaultAsync(x => x.Number == num);
             var startDate = DateOnly.FromDateTime(start);
             var endDate = DateOnly.FromDateTime(end);
             var response = new List<LessonDTO>();
@@ -48,7 +41,7 @@ namespace Schedule.Services
                 Include(x => x.Lesson).ThenInclude(ts => ts.Timeslot).
                 Where(x => x.Date >= startDate &&
                 x.Date <= endDate &&
-                x.Lesson.Teacher.Id == id)
+                x.Lesson.Groups.Contains(thisGroup))
                 .ToListAsync();
 
             foreach (var lesson in lessons)

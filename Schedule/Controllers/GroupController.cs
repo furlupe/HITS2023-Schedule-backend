@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Schedule.Models.DTO;
+using Schedule.Services;
 
 namespace Schedule.Controllers
 {
@@ -7,19 +9,24 @@ namespace Schedule.Controllers
     [Route("groups")]
     public class GroupController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult GetAllGroups()
+        private readonly IGroupService _groupService;
+        public GroupController(IGroupService groupService)
         {
-            return Ok();
+            _groupService = groupService;
+        }
+        [HttpGet]
+        public async Task<ActionResult<List<int>>> GetAllGroups()
+        {
+            return await _groupService.GetAllGroups();
         }
 
         [HttpGet("{id}/schedule")]
-        public IActionResult GetGroupSchedule(
-            [BindRequired] Guid id,
+        public async Task<ActionResult<List<LessonDTO>>> GetGroupSchedule(
+            [BindRequired] int num,
             [BindRequired] DateTime startsAt,
             [BindRequired] DateTime endsAt)
         {
-            return Ok();
+            return await _groupService.GetSchedule(num, startsAt, endsAt);
         }
     }
 }
