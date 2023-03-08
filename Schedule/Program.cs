@@ -63,6 +63,7 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
 builder.Services.AddTransient<ICabinetService, CabinetService>();
 builder.Services.AddTransient<ITeacherService, TeacherService>();
+builder.Services.AddTransient<IGroupService, GroupService>();
 
 builder.Services.AddAuthorization(options =>
 {
