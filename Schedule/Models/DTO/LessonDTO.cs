@@ -2,12 +2,12 @@
 {
     public class LessonDTO
     {
+        public int Type { get; set; }
         public string Subject { get; set; }
         public CabinetDTO Cabinet { get; set; }
-        public List<int> GroupsNum { get; set; }
         public string Teacher { get; set; }
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
-
+        public TimeslotDTO Timeslot { get; set; }
+        public List<int> GroupsNum { get; set; }
+        public DateOnly Date { get; set; }
     }
 }
