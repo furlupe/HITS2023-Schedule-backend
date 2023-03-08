@@ -58,7 +58,7 @@ namespace Schedule.Services.Classes
                 var dateReplacemnt = new DateOnly();
                 response.Add(new LessonDTO
                 {
-                    Type = Convert.ToInt32(lesson.Lesson.Type),
+                    Type = lesson.Lesson.Type,
                     Subject = lesson.Lesson.Subject.Name,
                     Cabinet = new CabinetDTO
                     {
