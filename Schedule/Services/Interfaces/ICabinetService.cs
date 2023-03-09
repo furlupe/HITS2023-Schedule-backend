@@ -4,7 +4,7 @@ namespace Schedule.Services.Interfaces
 {
     public interface ICabinetService
     {
-        Task<List<int>> GetAllCabinets();
-        Task<List<LessonDTO>> GetSchedule(int num, DateTime start, DateTime ends);
+        Task<CabinetListDto> GetAllCabinets();
+        Task<LessonListDto> GetSchedule(int num, DateTime start, DateTime ends);
     }
 }

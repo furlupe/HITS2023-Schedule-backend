@@ -12,7 +12,7 @@ namespace Schedule.Services.Classes
         {
             _context = applicationContext;
         }
-        public async Task<ICollection<TimeslotDTO>> GetTimeslots()
+        public async Task<TimeslotListDto> GetTimeslots()
         {
             var response = new List<TimeslotDTO>();
             var timeslots = await _context.Timeslots.ToListAsync();
@@ -26,7 +26,7 @@ namespace Schedule.Services.Classes
                     endsAt = dateReplacement.ToDateTime(t.EndsAt)
                 });
             }
-            return response;
+            return new TimeslotListDto { Timeslots = response };
         }
     }
 }
