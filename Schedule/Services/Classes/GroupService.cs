@@ -35,20 +35,20 @@ namespace Schedule.Services.Classes
             var endDate = DateOnly.FromDateTime(end);
             var response = new List<LessonDTO>();
             var lessons = await _context.ScheduledLessons.
-                Include(x => x.Lesson).ThenInclude(cab => cab.Cabinet).
-                Include(x => x.Lesson).ThenInclude(sub => sub.Subject).
-                Include(x => x.Lesson).ThenInclude(th => th.Teacher).
-                Include(x => x.Lesson).ThenInclude(gr => gr.Groups).
-                Include(x => x.Lesson).ThenInclude(ts => ts.Timeslot).
+                Include(x => x.BaseLesson).ThenInclude(cab => cab.Cabinet).
+                Include(x => x.BaseLesson).ThenInclude(sub => sub.Subject).
+                Include(x => x.BaseLesson).ThenInclude(th => th.Teacher).
+                Include(x => x.BaseLesson).ThenInclude(gr => gr.Groups).
+                Include(x => x.Timeslot).
                 Where(x => x.Date >= startDate &&
-                x.Date <= endDate &&
-                x.Lesson.Groups.Contains(thisGroup))
+                    x.Date <= endDate &&
+                    x.BaseLesson.Groups.Contains(thisGroup))
                 .ToListAsync();
 
             foreach (var lesson in lessons)
             {
                 List<int> groups = new List<int>();
-                foreach (var group in lesson.Lesson.Groups)
+                foreach (var group in lesson.BaseLesson.Groups)
                 {
                     groups.Add(group.Number);
                 }
@@ -56,21 +56,26 @@ namespace Schedule.Services.Classes
                 var dateReplacemnt = new DateOnly();
                 response.Add(new LessonDTO
                 {
-                    Type = lesson.Lesson.Type,
-                    Subject = lesson.Lesson.Subject.Name,
-                    Cabinet = new CabinetDTO
+                    Id = lesson.Id,
+                    Lesson = new LessonShortDto
                     {
-                        Number = lesson.Lesson.Cabinet.Number,
-                        Name = lesson.Lesson.Cabinet.Name
+                        Id = lesson.BaseLesson.Id,
+                        Teacher = lesson.BaseLesson.Teacher.Name,
+                        Subject = lesson.BaseLesson.Subject.Name,
+                        Groups = groups,
+                        Type = lesson.BaseLesson.Type,
+                        Cabinet = new CabinetDTO
+                        {
+                            Name = lesson.BaseLesson.Cabinet.Name,
+                            Number = lesson.BaseLesson.Cabinet.Number
+                        }
                     },
-                    Teacher = lesson.Lesson.Teacher.Name,
                     Timeslot = new TimeslotDTO
                     {
-                        Id = lesson.Lesson.Timeslot.Id,
-                        startAt = dateReplacemnt.ToDateTime(lesson.Lesson.Timeslot.StartsAt),
-                        endsAt = dateReplacemnt.ToDateTime(lesson.Lesson.Timeslot.EndsAt)
+                        Id = lesson.Timeslot.Id,
+                        startAt = dateReplacemnt.ToDateTime(lesson.Timeslot.StartsAt),
+                        endsAt = dateReplacemnt.ToDateTime(lesson.Timeslot.EndsAt)
                     },
-                    GroupsNum = groups,
                     Date = lesson.Date.ToDateTime(new TimeOnly(0, 0))
                 });
             }

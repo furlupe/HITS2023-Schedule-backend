@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Schedule.Utils;
@@ -11,9 +12,11 @@ using Schedule.Utils;
 namespace Schedule.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20230309092623_MoveTimeslotToSL")]
+    partial class MoveTimeslotToSL
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,8 +57,8 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            RolesId = new Guid("7291d761-5f66-4e63-bfe8-dcf787428ad6"),
-                            UsersId = new Guid("a2b5e5e7-1991-43ef-96a0-f21f327749d9")
+                            RolesId = new Guid("c26bc57f-534d-47aa-bb44-efa09eaa7c98"),
+                            UsersId = new Guid("145e9c0b-1230-48d3-a311-796ecb91c441")
                         });
                 });
 
@@ -168,18 +171,18 @@ namespace Schedule.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("BaseLessonId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
+
+                    b.Property<Guid>("LessonId")
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("TimeslotId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BaseLessonId");
+                    b.HasIndex("LessonId");
 
                     b.HasIndex("TimeslotId");
 
@@ -220,27 +223,27 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1f00a541-b9f1-441f-a1b3-bfdb408afcf0"),
+                            Id = new Guid("2269ecac-68e7-4cd1-9d81-f8ec9c6bcbe5"),
                             Value = 0
                         },
                         new
                         {
-                            Id = new Guid("e4bbd429-cab4-4741-914d-f868a0e51b96"),
+                            Id = new Guid("b2463ec2-a1b5-42ac-a4f7-1fc5cc35b8b9"),
                             Value = 1
                         },
                         new
                         {
-                            Id = new Guid("e48a219e-e730-4426-abd3-b5ba31e6dea5"),
+                            Id = new Guid("72d3f413-ec47-443b-8d58-e8409308ad8f"),
                             Value = 2
                         },
                         new
                         {
-                            Id = new Guid("f75fd0be-f94d-4966-9288-cbbf2efd9a36"),
+                            Id = new Guid("52741dc7-ac53-4cf7-b099-f9eca7008930"),
                             Value = 3
                         },
                         new
                         {
-                            Id = new Guid("7291d761-5f66-4e63-bfe8-dcf787428ad6"),
+                            Id = new Guid("c26bc57f-534d-47aa-bb44-efa09eaa7c98"),
                             Value = 4
                         });
                 });
@@ -267,22 +270,22 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a5a03a62-09db-4e29-b3d8-b5a4db4ed34d"),
+                            Id = new Guid("5e6552c3-d7a5-478a-ad76-684f6f648ea0"),
                             Name = "Albebra"
                         },
                         new
                         {
-                            Id = new Guid("c9a6e332-46ae-41a0-bf5e-e1ff058f11e9"),
+                            Id = new Guid("f60a1705-b620-4f11-aea5-e49b8cad9ad4"),
                             Name = "English language"
                         },
                         new
                         {
-                            Id = new Guid("48f21452-ef29-4703-8906-7daebd7a9c3f"),
+                            Id = new Guid("71264118-44f3-40d5-a382-84d1406f1c95"),
                             Name = "Programming"
                         },
                         new
                         {
-                            Id = new Guid("afefed60-dad4-4b7b-8003-17960eeada5d"),
+                            Id = new Guid("e7946e57-3489-45af-9b33-9a715cbad2cc"),
                             Name = "Amogusing"
                         });
                 });
@@ -304,12 +307,12 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("31734aa4-00aa-42f0-8b60-93eab68c4b7d"),
+                            Id = new Guid("74ba0242-ce13-4b25-a6ae-4a3777a475ec"),
                             Name = "Amogus Ballser"
                         },
                         new
                         {
-                            Id = new Guid("0c691990-d467-4984-b1c6-34ad6025b640"),
+                            Id = new Guid("41d2a1a0-3b7b-407d-ba6d-30f4d46898bf"),
                             Name = "Name Name Teacher"
                         });
                 });
@@ -333,19 +336,19 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("0260f3c9-a031-4cf5-9fae-4c097655f375"),
+                            Id = new Guid("9161f3c5-3d0d-4aff-9258-5fb25b50e0a0"),
                             EndsAt = new TimeOnly(10, 20, 0),
                             StartsAt = new TimeOnly(8, 45, 0)
                         },
                         new
                         {
-                            Id = new Guid("9c2c48ef-6fb9-468b-91cb-654566540bf4"),
+                            Id = new Guid("46e0c27b-d260-418c-a719-ddf7d2ad235d"),
                             EndsAt = new TimeOnly(12, 10, 0),
                             StartsAt = new TimeOnly(10, 35, 0)
                         },
                         new
                         {
-                            Id = new Guid("ffde25f3-98e7-4856-aa50-4497af87f52d"),
+                            Id = new Guid("a12393fa-f216-4a1e-8f27-a4b4c9cbe664"),
                             EndsAt = new TimeOnly(14, 0, 0),
                             StartsAt = new TimeOnly(12, 25, 0)
                         });
@@ -385,7 +388,7 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a2b5e5e7-1991-43ef-96a0-f21f327749d9"),
+                            Id = new Guid("145e9c0b-1230-48d3-a311-796ecb91c441"),
                             Login = "furlupe",
                             Password = "3414A9BE42AE5049DD6DBEE1E2C70A986C2E5C20B6E7BF3DDA103678FDDAA7DB"
                         });
@@ -450,9 +453,9 @@ namespace Schedule.Migrations
 
             modelBuilder.Entity("Schedule.Models.LessonScheduled", b =>
                 {
-                    b.HasOne("Schedule.Models.Lesson", "BaseLesson")
+                    b.HasOne("Schedule.Models.Lesson", "Lesson")
                         .WithMany()
-                        .HasForeignKey("BaseLessonId")
+                        .HasForeignKey("LessonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -462,7 +465,7 @@ namespace Schedule.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("BaseLesson");
+                    b.Navigation("Lesson");
 
                     b.Navigation("Timeslot");
                 });

@@ -18,13 +18,26 @@ namespace Schedule.Services.Classes
         public async Task CreateLesson(LessonCreateDTO lesson)
         {
             var newLesson = await MakeLesson(lesson);
+            var timeslot = await _context.Timeslots.SingleOrDefaultAsync(t => t.Id == lesson.Timeslot)
+                ?? throw new BadHttpRequestException("No such timeslot");
 
-            if (await LessonIntersects(newLesson))
-                throw new BadHttpRequestException("Lesson intersects");
+            var lessonPeriod = new Period(lesson.StartsAt, lesson.EndsAt);
+            await CheckIfLessonIntersects(
+                    newLesson,
+                    lessonPeriod,
+                    lesson.Day,
+                    timeslot
+                );
 
             await _context.Lessons.AddAsync(newLesson);
             await _context.SaveChangesAsync();
-            await ScheduleLessons(newLesson);
+
+            await ScheduleLessons(
+                    newLesson,
+                    lessonPeriod,
+                    lesson.Day,
+                    timeslot
+                );
         }
 
         public async Task EditSingleLesson(SingleLessonEditDto lesson, Guid id)
@@ -44,6 +57,11 @@ namespace Schedule.Services.Classes
                 throw new BadHttpRequestException("Lesson intersection");
             }
 
+            if (l.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
+            {
+                throw new BadHttpRequestException("You can't change lessons from the past!");
+            }
+
             l.Timeslot = timeslot;
             l.Date = DateOnly.FromDateTime(lesson.Date);
             await _context.SaveChangesAsync();
@@ -56,32 +74,62 @@ namespace Schedule.Services.Classes
                 ?? throw new BadHttpRequestException("No such lesson");
 
             var newLesson = await MakeLesson(lesson);
-            if (await LessonIntersects(newLesson, l.Id))
-                throw new BadHttpRequestException("Lesson intersects");
+            var timeslot = await _context.Timeslots.SingleOrDefaultAsync(t => t.Id == lesson.Timeslot)
+                ?? throw new BadHttpRequestException("No such timeslot");
 
+            var lessonPeriod = new Period(lesson.StartsAt, lesson.EndsAt);
+            await CheckIfLessonIntersects(
+                    newLesson,
+                    lessonPeriod,
+                    lesson.Day,
+                    timeslot
+                );
 
             _context.Entry(l).CurrentValues.SetValues(new
             {
-                newLesson.Timeslot,
                 newLesson.Cabinet,
                 newLesson.Groups,
                 newLesson.Subject,
                 newLesson.Teacher,
-                newLesson.Day,
-                newLesson.Type,
-                newLesson.DateFrom,
-                newLesson.DateUntil
+                newLesson.Type
             });
 
             await _context.SaveChangesAsync();
 
             await _context.SaveChangesAsync();
-            await RescheduleLessons(l);
+            await RescheduleLessons(l, lessonPeriod, lesson.Day, timeslot);
         }
 
-        public async Task DeleteLesson(Guid id)
+        public async Task DeleteSingleLesson(Guid id)
         {
+            var l = await _context.ScheduledLessons
+                .SingleOrDefaultAsync(l => l.Id == id)
+                ?? throw new BadHttpRequestException("No such scheduled lesson");
 
+            if(l.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
+            {
+                throw new BadHttpRequestException("You can't delete lessons from the past!");
+            }
+
+            _context.ScheduledLessons.Remove(l);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAllLessons(Guid id)
+        {
+            var l = await _context.Lessons
+                .SingleOrDefaultAsync(l => l.Id == id)
+                ?? throw new BadHttpRequestException("No such lesson");
+
+            _context.RemoveRange(await
+                _context.ScheduledLessons
+                .Where(les =>
+                        les.BaseLesson == l &&
+                        les.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
+                .ToListAsync()
+                );
+
+            await _context.SaveChangesAsync();
         }
 
         private async Task<Lesson> MakeLesson(LessonCreateDTO data)
@@ -95,14 +143,6 @@ namespace Schedule.Services.Classes
             var cabinet = await _context.Cabinets.SingleOrDefaultAsync(c => c.Number == data.Cabinet)
                 ?? throw new BadHttpRequestException("No such cabinet");
 
-            var timeslot = await _context.Timeslots.SingleOrDefaultAsync(t => t.Id == data.Timeslot)
-                ?? throw new BadHttpRequestException("No such timeslot");
-
-            if (await _context.Lessons.AnyAsync(l => l.Teacher == teacher && l.Timeslot == timeslot && l.Day == data.Day))
-            {
-                throw new BadHttpRequestException("Teacher is occupied on that time");
-            }
-
             var groups = await _context.Groups.Where(g => data.Groups.Contains(g.Number)).ToListAsync();
             var unaddedGroups = data.Groups.Except(groups.Select(g => g.Number));
             if (unaddedGroups.Any())
@@ -110,40 +150,45 @@ namespace Schedule.Services.Classes
                 throw new BadHttpRequestException("No such groups with ids:");
             }
 
-            if (await _context.Lessons.AnyAsync(l => l.Groups.Any(g => groups.Contains(g)) && l.Timeslot == timeslot && l.Day == data.Day))
+            return new Lesson
+            {
+                Type = data.Type,
+                Teacher = teacher,
+                Groups = groups,
+                Subject = subject,
+                Cabinet = cabinet
+            };
+        }
+        private async Task CheckIfLessonIntersects(Lesson lesson, Period period, DayOfWeek day, Timeslot timeslot)
+        {
+            var lessons = await _context.ScheduledLessons
+                .Where(l =>
+                        l.Date >= period.Start &&
+                        l.Date <= period.End &&
+                        l.Timeslot == timeslot &&
+                        l.Date.DayOfWeek == day &&
+                        l.Id != lesson.Id)
+                .Include(l => l.BaseLesson.Cabinet)
+                .Include(l => l.BaseLesson.Teacher)
+                .Include(l => l.BaseLesson.Groups)
+                .ToListAsync();
+
+            if (lessons.Any(l => l.BaseLesson.Cabinet == lesson.Cabinet))
+            {
+                throw new BadHttpRequestException("Cabinet intersection");
+            }
+
+            if (lessons.Any(l => l.BaseLesson.Teacher == lesson.Teacher))
+            {
+                throw new BadHttpRequestException("Teacher intersection");
+            }
+
+            if (lessons.Any(l => l.BaseLesson.Groups.Any(g => lesson.Groups.Contains(g))))
             {
                 throw new BadHttpRequestException(string.Format($"Groups are occupied on that time"));
             }
 
-            return new Lesson
-            {
-                Type = data.Type,
-                Day = data.Day,
-                Teacher = teacher,
-                Groups = groups,
-                Subject = subject,
-                Cabinet = cabinet,
-                Timeslot = timeslot,
-                DateFrom = DateOnly.FromDateTime(data.StartsAt),
-                DateUntil = DateOnly.FromDateTime(data.EndsAt)
-            };
-        }
-        private async Task<bool> LessonIntersects(Lesson lesson, Guid? ignore = null)
-        {
-            var lessonPeriod = new Period(lesson.DateFrom, lesson.DateUntil);
-            foreach (var l in await _context.Lessons
-                .Where(l =>
-                    l.Day == lesson.Day &&
-                    l.Cabinet == lesson.Cabinet &&
-                    l.Timeslot == lesson.Timeslot && l.Id != ignore)
-                .ToListAsync())
-            {
-                if (!lessonPeriod.IntersetsWith(new Period(l.DateFrom, l.DateUntil))) continue;
-
-                return true;
-            }
-
-            return false;
+            return;
         }
         private DateOnly GetClosestDateWithDay(DateOnly from, DayOfWeek day)
         {
@@ -151,10 +196,10 @@ namespace Schedule.Services.Classes
 
             return from;
         }
-        private async Task RescheduleLessons(Lesson lesson)
+        private async Task RescheduleLessons(Lesson lesson, Period period, DayOfWeek day, Timeslot timeslot)
         {
             var allScheduledLessons = await _context.ScheduledLessons
-                .Where(les => les.Lesson == lesson)
+                .Where(les => les.BaseLesson == lesson)
                 .ToListAsync();
 
             foreach (var sl in allScheduledLessons)
@@ -165,18 +210,18 @@ namespace Schedule.Services.Classes
             }
 
             await _context.SaveChangesAsync();
-            await ScheduleLessons(lesson);
+            await ScheduleLessons(lesson, period, day, timeslot);
         }
-        private async Task ScheduleLessons(Lesson lesson)
+        private async Task ScheduleLessons(Lesson lesson, Period period, DayOfWeek day, Timeslot timeslot)
         {
-            var startDate = GetClosestDateWithDay(lesson.DateFrom, lesson.Day);
-            for (; startDate <= lesson.DateUntil; startDate = startDate.AddDays(7))
+            var startDate = GetClosestDateWithDay(period.Start, day);
+            for (; startDate <= period.End; startDate = startDate.AddDays(7))
             {
                 await _context.ScheduledLessons.AddAsync(new LessonScheduled
                 {
-                    Lesson = lesson,
+                    BaseLesson = lesson,
                     Date = startDate,
-                    Timeslot = lesson.Timeslot
+                    Timeslot = timeslot
                 });
             }
             await _context.SaveChangesAsync();
