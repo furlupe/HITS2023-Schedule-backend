@@ -7,6 +7,7 @@ namespace Schedule.Services.Interfaces
         Task CreateLesson(LessonCreateDTO lesson);
         Task EditSingleLesson(SingleLessonEditDto lesson, Guid id);
         Task EditAllLessons(LessonCreateDTO lesson, Guid id);
-        Task DeleteLesson(Guid id);
+        Task DeleteSingleLesson(Guid id);
+        Task DeleteAllLessons(Guid id);
     }
 }

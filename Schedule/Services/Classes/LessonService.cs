@@ -3,8 +3,6 @@ using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Services.Interfaces;
 using Schedule.Utils;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Text.RegularExpressions;
 
 namespace Schedule.Services.Classes
 {
@@ -59,6 +57,11 @@ namespace Schedule.Services.Classes
                 throw new BadHttpRequestException("Lesson intersection");
             }
 
+            if (l.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
+            {
+                throw new BadHttpRequestException("You can't change lessons from the past!");
+            }
+
             l.Timeslot = timeslot;
             l.Date = DateOnly.FromDateTime(lesson.Date);
             await _context.SaveChangesAsync();
@@ -97,9 +100,36 @@ namespace Schedule.Services.Classes
             await RescheduleLessons(l, lessonPeriod, lesson.Day, timeslot);
         }
 
-        public async Task DeleteLesson(Guid id)
+        public async Task DeleteSingleLesson(Guid id)
         {
+            var l = await _context.ScheduledLessons
+                .SingleOrDefaultAsync(l => l.Id == id)
+                ?? throw new BadHttpRequestException("No such scheduled lesson");
 
+            if(l.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
+            {
+                throw new BadHttpRequestException("You can't delete lessons from the past!");
+            }
+
+            _context.ScheduledLessons.Remove(l);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAllLessons(Guid id)
+        {
+            var l = await _context.Lessons
+                .SingleOrDefaultAsync(l => l.Id == id)
+                ?? throw new BadHttpRequestException("No such lesson");
+
+            _context.RemoveRange(await
+                _context.ScheduledLessons
+                .Where(les =>
+                        les.BaseLesson == l &&
+                        les.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
+                .ToListAsync()
+                );
+
+            await _context.SaveChangesAsync();
         }
 
         private async Task<Lesson> MakeLesson(LessonCreateDTO data)
@@ -138,22 +168,22 @@ namespace Schedule.Services.Classes
                         l.Timeslot == timeslot &&
                         l.Date.DayOfWeek == day &&
                         l.Id != lesson.Id)
-                .Include(l => l.Lesson.Cabinet)
-                .Include(l => l.Lesson.Teacher)
-                .Include(l => l.Lesson.Groups)
+                .Include(l => l.BaseLesson.Cabinet)
+                .Include(l => l.BaseLesson.Teacher)
+                .Include(l => l.BaseLesson.Groups)
                 .ToListAsync();
 
-            if (lessons.Any(l => l.Lesson.Cabinet == lesson.Cabinet))
+            if (lessons.Any(l => l.BaseLesson.Cabinet == lesson.Cabinet))
             {
                 throw new BadHttpRequestException("Cabinet intersection");
             }
 
-            if (lessons.Any(l => l.Lesson.Teacher == lesson.Teacher))
+            if (lessons.Any(l => l.BaseLesson.Teacher == lesson.Teacher))
             {
                 throw new BadHttpRequestException("Teacher intersection");
             }
 
-            if (lessons.Any(l => l.Lesson.Groups.Any(g => lesson.Groups.Contains(g))))
+            if (lessons.Any(l => l.BaseLesson.Groups.Any(g => lesson.Groups.Contains(g))))
             {
                 throw new BadHttpRequestException(string.Format($"Groups are occupied on that time"));
             }
@@ -169,7 +199,7 @@ namespace Schedule.Services.Classes
         private async Task RescheduleLessons(Lesson lesson, Period period, DayOfWeek day, Timeslot timeslot)
         {
             var allScheduledLessons = await _context.ScheduledLessons
-                .Where(les => les.Lesson == lesson)
+                .Where(les => les.BaseLesson == lesson)
                 .ToListAsync();
 
             foreach (var sl in allScheduledLessons)
@@ -189,7 +219,7 @@ namespace Schedule.Services.Classes
             {
                 await _context.ScheduledLessons.AddAsync(new LessonScheduled
                 {
-                    Lesson = lesson,
+                    BaseLesson = lesson,
                     Date = startDate,
                     Timeslot = timeslot
                 });

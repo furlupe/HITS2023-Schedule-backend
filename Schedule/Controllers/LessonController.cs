@@ -41,11 +41,19 @@ namespace Schedule.Controllers
             return Ok();
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("single/{id}")]
         [RoleAuthorization(RoleEnum.EDITOR | RoleEnum.ADMIN | RoleEnum.ROOT)]
-        public async Task<IActionResult> RemoveLesson([BindRequired] Guid id)
+        public async Task<IActionResult> RemoveSingleLesson([BindRequired] Guid id)
         {
-            await _lessonService.DeleteLesson(id);
+            await _lessonService.DeleteSingleLesson(id);
+            return Ok();
+        }
+
+        [HttpDelete("all/{id}")]
+        [RoleAuthorization(RoleEnum.EDITOR | RoleEnum.ADMIN | RoleEnum.ROOT)]
+        public async Task<IActionResult> RemoveAllLesson([BindRequired] Guid id)
+        {
+            await _lessonService.DeleteAllLessons(id);
             return Ok();
         }
     }
