@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Services.Interfaces;
 using Schedule.Utils;
@@ -15,7 +16,7 @@ namespace Schedule.Services.Classes
             _context = context;
         }
 
-        public async Task<List<TeacherDTO>> GetAllTeachers()
+        public async Task<TeacherListDto> GetAllTeachers()
         {
             var response = new List<TeacherDTO>();
             var teachers = await _context.Teachers.ToListAsync();
@@ -27,19 +28,21 @@ namespace Schedule.Services.Classes
                     Name = teacher.Name
                 });
             }
-            return response;
+            return new TeacherListDto { Teachers = response };
         }
 
-        public async Task<List<LessonDTO>> GetSchedule(Guid id, DateTime start, DateTime end)
+        public async Task<LessonListDto> GetSchedule(Guid id, DateTime start, DateTime end)
         {
-            var confir = await _context.Teachers.FirstOrDefaultAsync(c => c.Id == id);
-            if (confir == null)
-            {
-                throw new BadHttpRequestException(string.Format(ErrorStrings.TEACHER_WRONG_ID_ERROR, id),
-                    StatusCodes.Status404NotFound);
-            }
+            var confir = await _context.Teachers.FirstOrDefaultAsync(c => c.Id == id) 
+                ?? throw new BadHttpRequestException(
+                    string.Format(
+                        ErrorStrings.TEACHER_WRONG_ID_ERROR, id),
+                        StatusCodes.Status404NotFound
+                        );
+
             var startDate = DateOnly.FromDateTime(start);
             var endDate = DateOnly.FromDateTime(end);
+
             var response = new List<LessonDTO>();
             var lessons = await _context.ScheduledLessons.
                 Include(x => x.BaseLesson).ThenInclude(cab => cab.Cabinet).
@@ -86,7 +89,13 @@ namespace Schedule.Services.Classes
                     Date = lesson.Date.ToDateTime(new TimeOnly(0, 0))
                 });
             }
-            return response;
+            return new LessonListDto { Lessons = response };
+        }
+
+        public async Task<LessonListDto> GetUserSchedule(Guid id, DateTime start, DateTime end)
+        {
+            var user = await _context.Users.SingleAsync(u => u.Id == id);
+            return await GetSchedule(user.TeacherProfile.Id, start, end);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Schedule.Services.Classes
         {
             _context = context;
         }
-        public async Task<ICollection<SubjectDto>> GetSubjects()
+        public async Task<SubjectListDto> GetSubjects()
         {
             var response = new List<SubjectDto>();
             var subjects = await _context.Subjects.ToListAsync();
@@ -20,7 +20,7 @@ namespace Schedule.Services.Classes
             {
                 response.Add(new SubjectDto { Id = subject.Id, Name = subject.Name });
             }
-            return response;
+            return new SubjectListDto { Subjects = response };
         }
     }
 }

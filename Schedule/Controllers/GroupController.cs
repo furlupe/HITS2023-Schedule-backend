@@ -19,7 +19,7 @@ namespace Schedule.Controllers
             _groupService = groupService;
         }
         [HttpGet]
-        public async Task<ActionResult<List<int>>> GetAllGroups()
+        public async Task<ActionResult<GroupListDto>> GetAllGroups()
         {
             return Ok(await _groupService.GetAllGroups());
         }
@@ -27,7 +27,7 @@ namespace Schedule.Controllers
         [HttpGet("me/schedule")]
         [RoleAuthorization(RoleEnum.STUDENT | RoleEnum.TEACHER)]
         [Authorize(Policy = "NotBlacklisted")]
-        public async Task<ActionResult<List<LessonDTO>>> GetUserSchedule(
+        public async Task<ActionResult<LessonListDto>> GetUserSchedule(
             [BindRequired] DateTime startsAt,
             [BindRequired] DateTime endsAt)
         {
@@ -37,7 +37,7 @@ namespace Schedule.Controllers
             return Ok(await _groupService.GetUserSchedule(userId, startsAt, endsAt));
         }
         [HttpGet("{num}/schedule")]
-        public async Task<ActionResult<List<LessonDTO>>> GetGroupSchedule(
+        public async Task<ActionResult<LessonListDto>> GetGroupSchedule(
             [BindRequired] int num,
             [BindRequired] DateTime startsAt,
             [BindRequired] DateTime endsAt)

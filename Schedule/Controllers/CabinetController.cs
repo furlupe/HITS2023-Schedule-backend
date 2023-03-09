@@ -18,13 +18,13 @@ namespace Schedule.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<int>>> GetAllCabinets()
+        public async Task<ActionResult<CabinetListDto>> GetAllCabinets()
         {
             return Ok(await _cabinetService.GetAllCabinets());
         }
 
         [HttpGet("{number}/schedule")]
-        public async Task<ActionResult<List<LessonDTO>>> GetCabinetSchedule(
+        public async Task<ActionResult<LessonListDto>> GetCabinetSchedule(
             [BindRequired] int number,
             [BindRequired] DateTime startsAt,
             [BindRequired] DateTime endsAt)

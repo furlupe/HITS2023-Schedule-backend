@@ -12,7 +12,7 @@ namespace Schedule.Services.Classes
         {
             _context = context;
         }
-        public async Task<List<int>> GetAllGroups()
+        public async Task<GroupListDto> GetAllGroups()
         {
             var response = new List<int>();
             var groups = await _context.Groups.ToListAsync();
@@ -20,20 +20,23 @@ namespace Schedule.Services.Classes
             {
                 response.Add(group.Number);
             }
-            return response;
+            return new GroupListDto { Groups = response };
         }
-        public async Task<List<LessonDTO>> GetSchedule(int num, DateTime start, DateTime end)
+        public async Task<LessonListDto> GetSchedule(int num, DateTime start, DateTime end)
         {
-            var confir = await _context.Groups.FirstOrDefaultAsync(c => c.Number == num);
-            if (confir == null)
-            {
-                throw new BadHttpRequestException(string.Format(ErrorStrings.GROUP_WRONG_ID_ERROR, num),
-                    StatusCodes.Status404NotFound);
-            }
+            var confir = await _context.Groups.FirstOrDefaultAsync(c => c.Number == num) 
+                ?? throw new BadHttpRequestException(
+                    string.Format(
+                        ErrorStrings.GROUP_WRONG_ID_ERROR, num),
+                        StatusCodes.Status404NotFound
+                        );
+
             var thisGroup = await _context.Groups.FirstOrDefaultAsync(x => x.Number == num);
             var startDate = DateOnly.FromDateTime(start);
             var endDate = DateOnly.FromDateTime(end);
+
             var response = new List<LessonDTO>();
+
             var lessons = await _context.ScheduledLessons.
                 Include(x => x.BaseLesson).ThenInclude(cab => cab.Cabinet).
                 Include(x => x.BaseLesson).ThenInclude(sub => sub.Subject).
@@ -79,10 +82,10 @@ namespace Schedule.Services.Classes
                     Date = lesson.Date.ToDateTime(new TimeOnly(0, 0))
                 });
             }
-            return response;
+            return new LessonListDto { Lessons = response };
         }
 
-        public async Task<List<LessonDTO>> GetUserSchedule(Guid userId, DateTime start, DateTime end)
+        public async Task<LessonListDto> GetUserSchedule(Guid userId, DateTime start, DateTime end)
         {
             var user = await _context.Users.SingleAsync(u => u.Id == userId);
             return await GetSchedule(user.Group.Number, start, end);

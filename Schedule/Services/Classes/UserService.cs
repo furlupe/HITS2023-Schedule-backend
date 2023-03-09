@@ -26,7 +26,7 @@ namespace Schedule.Services.Classes
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
         }
-        public async Task<ICollection<UserInfoDto>> GetUsers(ICollection<RoleEnum> roles)
+        public async Task<UserListDto> GetUsers(ICollection<RoleEnum> roles)
         {
             var selectedUsers = await _context.Users
                     .Include(u => u.Roles)
@@ -53,12 +53,15 @@ namespace Schedule.Services.Classes
                     Id = user.Id,
                     Login = user.Login,
                     Roles = user.Roles.Select(r => r.Value).ToList(),
-                    TeacherId = user.TeacherProfile is null ? null : user.TeacherProfile.Id,
-                    Group = user.Group is null ? null : user.Group.Number
+                    TeacherId = user.TeacherProfile is null ? null : new TeacherDTO { 
+                        Id = user.TeacherProfile.Id, 
+                        Name = user.TeacherProfile.Name
+                    },
+                    Group = user.Group?.Number
                 });
             }
 
-            return users;
+            return new UserListDto { Users = users };
         }
         public async Task<UserInfoDto> GetUser(Guid id)
         {
@@ -69,8 +72,11 @@ namespace Schedule.Services.Classes
                 Id = user.Id,
                 Login = user.Login,
                 Roles = user.Roles.Select(r => r.Value).ToList(),
-                TeacherId = user.TeacherProfile is null ? null : user.TeacherProfile.Id,
-                Group = user.Group is null ? null : user.Group.Number
+                TeacherId = user.TeacherProfile is null ? null : new TeacherDTO { 
+                    Id = user.TeacherProfile.Id, 
+                    Name = user.TeacherProfile.Name 
+                },
+                Group = user.Group?.Number
             };
         }
 

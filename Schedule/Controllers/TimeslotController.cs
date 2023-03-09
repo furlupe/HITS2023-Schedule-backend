@@ -15,7 +15,7 @@ namespace Schedule.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ICollection<TimeslotDTO>>> GetTimeslots()
+        public async Task<ActionResult<TimeslotListDto>> GetTimeslots()
         {
             return Ok(await _timeslotService.GetTimeslots());
         }

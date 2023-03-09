@@ -14,28 +14,35 @@ namespace Schedule.Services.Classes
             _context = context;
         }
 
-        public async Task<List<int>> GetAllCabinets()
+        public async Task<CabinetListDto> GetAllCabinets()
         {
-            var response = new List<int>();
+            var cabinets = new List<CabinetDTO>();
             var cabinetModel = await _context.Cabinets.ToListAsync();
             foreach (var cabinet in cabinetModel)
             {
-                response.Add(cabinet.Number);
+                cabinets.Add(new CabinetDTO
+                {
+                    Name = cabinet.Name,
+                    Number = cabinet.Number
+                });
             }
-            return response;
+            return new CabinetListDto { Cabinets = cabinets };
         }
 
-        public async Task<List<LessonDTO>> GetSchedule(int num, DateTime starts, DateTime ends)
+        public async Task<LessonListDto> GetSchedule(int num, DateTime starts, DateTime ends)
         {
-            var confir = await _context.Cabinets.FirstOrDefaultAsync(c => c.Number == num);
-            if (confir == null)
-            {
-                throw new BadHttpRequestException(string.Format(ErrorStrings.CABINET_WRONG_ID_ERROR, num),
-                    StatusCodes.Status404NotFound);
-            }
+            var confir = await _context.Cabinets.FirstOrDefaultAsync(c => c.Number == num)
+                ?? throw new BadHttpRequestException(
+                    string.Format(
+                        ErrorStrings.CABINET_WRONG_ID_ERROR, num),
+                        StatusCodes.Status404NotFound
+                        );
+
             var startDate = DateOnly.FromDateTime(starts);
             var endDate = DateOnly.FromDateTime(ends);
+
             var response = new List<LessonDTO>();
+
             var lessons = await _context.ScheduledLessons.
                 Include(x => x.BaseLesson).ThenInclude(cab => cab.Cabinet).
                 Include(x => x.BaseLesson).ThenInclude(sub => sub.Subject).
@@ -81,7 +88,7 @@ namespace Schedule.Services.Classes
                     Date = lesson.Date.ToDateTime(new TimeOnly(0, 0))
                 });
             }
-            return response;
+            return new LessonListDto { Lessons = response };
         }
     }
 }

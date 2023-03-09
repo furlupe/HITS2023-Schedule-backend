@@ -20,7 +20,7 @@ namespace Schedule.Controllers
         }
         [HttpGet]
         [Authorize(Policy = "NotBlacklisted")]
-        public async Task<ActionResult<ICollection<UserInfoDto>>> GetListOfUsers([FromQuery(Name = "role")] ICollection<RoleEnum> roles)
+        public async Task<ActionResult<UserListDto>> GetListOfUsers([FromQuery(Name = "role")] ICollection<RoleEnum> roles)
             => Ok(await _userService.GetUsers(roles));
 
         [HttpGet("me")]

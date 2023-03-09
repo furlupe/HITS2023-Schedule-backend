@@ -14,7 +14,7 @@ namespace Schedule.Controllers
             _subjectService = groupService;
         }
         [HttpGet]
-        public async Task<ActionResult<ICollection<SubjectDto>>> GetAllGroups()
+        public async Task<ActionResult<SubjectListDto>> GetAllGroups()
         {
             return Ok(await _subjectService.GetSubjects());
         }
