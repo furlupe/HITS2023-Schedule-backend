@@ -6,5 +6,6 @@ namespace Schedule.Services.Interfaces
     {
         Task<List<TeacherDTO>> GetAllTeachers();
         Task<List<LessonDTO>> GetSchedule(Guid id, DateTime start, DateTime end);
+        Task<string> GetName(Guid id);
     }
 }

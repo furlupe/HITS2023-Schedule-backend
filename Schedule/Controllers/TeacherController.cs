@@ -38,6 +38,14 @@ namespace Schedule.Controllers
             return Ok(await _teacherService.GetSchedule(userId, startsAt, endsAt));
         }
 
+        [HttpGet("{id}")]
+        [Authorize(Policy = "NotBlackListed")]
+        [RoleAuthorization(RoleEnum.TEACHER)]
+        public async Task<ActionResult<string>> GetName([BindRequired] Guid id)
+        {
+            return Ok(await _teacherService.GetName(id));
+        }
+
         [HttpGet("{id}/schedule")]
         public async Task<ActionResult<List<LessonDTO>>> GetTeacherSchedule(
             [BindRequired] Guid id,
