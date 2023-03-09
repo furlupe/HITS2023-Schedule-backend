@@ -41,7 +41,7 @@ namespace Schedule.Services.Classes
                 Include(x => x.Lesson).ThenInclude(sub => sub.Subject).
                 Include(x => x.Lesson).ThenInclude(th => th.Teacher).
                 Include(x => x.Lesson).ThenInclude(gr => gr.Groups).
-                Include(x => x.Lesson).ThenInclude(ts => ts.Timeslot).
+                Include(x => x.Timeslot).
                 Where(x => x.Date >= startDate &&
                 x.Date <= endDate &&
                 x.Lesson.Cabinet.Number == num)
@@ -68,9 +68,9 @@ namespace Schedule.Services.Classes
                     Teacher = lesson.Lesson.Teacher.Name,
                     Timeslot = new TimeslotDTO
                     {
-                        Id = lesson.Lesson.Timeslot.Id,
-                        startAt = dateReplacemnt.ToDateTime(lesson.Lesson.Timeslot.StartsAt),
-                        endsAt = dateReplacemnt.ToDateTime(lesson.Lesson.Timeslot.EndsAt)
+                        Id = lesson.Timeslot.Id,
+                        startAt = dateReplacemnt.ToDateTime(lesson.Timeslot.StartsAt),
+                        endsAt = dateReplacemnt.ToDateTime(lesson.Timeslot.EndsAt)
                     },
                     GroupsNum = groups,
                     Date = lesson.Date.ToDateTime(new TimeOnly(0, 0))
