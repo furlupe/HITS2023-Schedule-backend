@@ -97,5 +97,16 @@ namespace Schedule.Services.Classes
             var user = await _context.Users.SingleAsync(u => u.Id == id);
             return await GetSchedule(user.TeacherProfile.Id, start, end);
         }
+
+        public async Task<string> GetName(Guid id)
+        {
+            var teacher = await _context.Teachers.FirstOrDefaultAsync(x => x.Id == id);
+            if (teacher == null)
+            {
+                throw new BadHttpRequestException(string.Format(ErrorStrings.TEACHER_WRONG_ID_ERROR, id),
+                    StatusCodes.Status404NotFound);
+            }
+            return teacher.Name;
+        }
     }
 }
