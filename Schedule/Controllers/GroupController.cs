@@ -36,13 +36,13 @@ namespace Schedule.Controllers
 
             return Ok(await _groupService.GetUserSchedule(userId, startsAt, endsAt));
         }
-        [HttpGet("{num}/schedule")]
+        [HttpGet("{number}/schedule")]
         public async Task<ActionResult<LessonListDto>> GetGroupSchedule(
-            [BindRequired] int num,
+            [BindRequired] int number,
             [BindRequired] DateTime startsAt,
             [BindRequired] DateTime endsAt)
         {
-            return Ok(await _groupService.GetSchedule(num, startsAt, endsAt));
+            return Ok(await _groupService.GetSchedule(number, startsAt, endsAt));
         }
     }
 }
