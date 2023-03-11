@@ -64,9 +64,10 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
 builder.Services.AddTransient<ISubjectService, SubjectService>();
 builder.Services.AddTransient<ITimeslotService, TimeslotService>();
-builder.Services.AddScoped<ICabinetService, CabinetService>();
-builder.Services.AddScoped<ITeacherService, TeacherService>();
-builder.Services.AddScoped<IGroupService, GroupService>();
+builder.Services.AddTransient<ICabinetService, CabinetService>();
+builder.Services.AddTransient<ITeacherService, TeacherService>();
+builder.Services.AddTransient<IGroupService, GroupService>();
+builder.Services.AddTransient<IEntityScheduleService, EntityScheduleService>();
 
 builder.Services.AddAuthorization(options =>
 {
