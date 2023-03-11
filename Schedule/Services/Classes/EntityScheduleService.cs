@@ -26,7 +26,11 @@ namespace Schedule.Services.Classes
                     Lesson = new LessonShortDto
                     {
                         Id = lesson.BaseLesson.Id,
-                        Teacher = lesson.BaseLesson.Teacher.Name,
+                        Teacher = new TeacherDTO
+                        {
+                            Name = lesson.BaseLesson.Teacher.Name,
+                            Id = lesson.BaseLesson.Teacher.Id
+                        },
                         Subject = lesson.BaseLesson.Subject.Name,
                         Groups = groups,
                         Type = lesson.BaseLesson.Type,
