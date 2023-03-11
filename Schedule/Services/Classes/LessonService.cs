@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Schedule.Exceptions;
 using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Services.Interfaces;
@@ -48,13 +49,20 @@ namespace Schedule.Services.Classes
             var timeslot = await _context.Timeslots.SingleOrDefaultAsync(t => t.Id == lesson.TimeslotId)
                 ?? throw new BadHttpRequestException("No such timeslot");
 
-            if (await _context.ScheduledLessons.AnyAsync(
+            LessonScheduled? ls;
+            if ((ls = await _context.ScheduledLessons.SingleOrDefaultAsync(
                 les =>
                     les.Timeslot == timeslot &&
                     les.Date == DateOnly.FromDateTime(lesson.Date))
-                )
+                ) is not null)
             {
-                throw new BadHttpRequestException("Lesson intersection");
+                throw new DetailedException(
+                    "Lesson intersection", 
+                    StatusCodes.Status400BadRequest, 
+                    new
+                    {
+                        Lesson = ls
+                    });
             }
 
             if (l.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
@@ -134,6 +142,7 @@ namespace Schedule.Services.Classes
 
         private async Task<Lesson> MakeLesson(LessonCreateDTO data)
         {
+            List<object> errors = new();
             var teacher = await _context.Teachers.SingleOrDefaultAsync(t => t.Id == data.Teacher)
                 ?? throw new BadHttpRequestException("No such teacher");
 
@@ -147,7 +156,9 @@ namespace Schedule.Services.Classes
             var unaddedGroups = data.Groups.Except(groups.Select(g => g.Number));
             if (unaddedGroups.Any())
             {
-                throw new BadHttpRequestException("No such groups with ids:");
+                throw new BadHttpRequestException(
+                    string.Format("No such groups with ids: {0}", string.Join(", ", unaddedGroups))
+                    );
             }
 
             return new Lesson
@@ -173,19 +184,41 @@ namespace Schedule.Services.Classes
                 .Include(l => l.BaseLesson.Groups)
                 .ToListAsync();
 
-            if (lessons.Any(l => l.BaseLesson.Cabinet == lesson.Cabinet))
+            List<object> errors = new();
+            List<LessonScheduled> ls;
+            if ((ls = lessons.Where(l => l.BaseLesson.Cabinet == lesson.Cabinet).ToList()) is not null)
             {
-                throw new BadHttpRequestException("Cabinet intersection");
+                errors.Add(new
+                {
+                    Cabinet = ls
+                });
             }
 
-            if (lessons.Any(l => l.BaseLesson.Teacher == lesson.Teacher))
+            if ((ls = lessons.Where(l => l.BaseLesson.Teacher == lesson.Teacher).ToList()) is not null)
             {
-                throw new BadHttpRequestException("Teacher intersection");
+                errors.Add(new
+                {
+                    Teacher = ls
+                });
             }
 
-            if (lessons.Any(l => l.BaseLesson.Groups.Any(g => lesson.Groups.Contains(g))))
+            if (( ls = lessons.Where(
+                    l => l.BaseLesson.Groups.Any( g => lesson.Groups.Contains(g) ))
+                .ToList()) is not null)
             {
-                throw new BadHttpRequestException(string.Format($"Groups are occupied on that time"));
+                errors.Add(new
+                {
+                    Groups = ls
+                });
+            }
+
+            if(errors.Count > 0)
+            {
+                throw new DetailedException(
+                    "Lesson intersects with one or more other lessons",
+                    StatusCodes.Status400BadRequest,
+                    errors
+                    );
             }
 
             return;

@@ -8,9 +8,11 @@ namespace Schedule.Services.Classes
     public class GroupService : IGroupService
     {
         private readonly ApplicationContext _context;
-        public GroupService(ApplicationContext context)
+        private readonly IEntityScheduleService _educationalEntityService;
+        public GroupService(ApplicationContext context, IEntityScheduleService educationalEntityService)
         {
             _context = context;
+            _educationalEntityService = educationalEntityService;
         }
         public async Task<GroupListDto> GetAllGroups()
         {
@@ -24,18 +26,14 @@ namespace Schedule.Services.Classes
         }
         public async Task<LessonListDto> GetSchedule(int num, DateTime start, DateTime end)
         {
-            var confir = await _context.Groups.FirstOrDefaultAsync(c => c.Number == num) 
+            var thisGroup = await _context.Groups.FirstOrDefaultAsync(c => c.Number == num) 
                 ?? throw new BadHttpRequestException(
-                    string.Format(
-                        ErrorStrings.GROUP_WRONG_ID_ERROR, num),
-                        StatusCodes.Status404NotFound
-                        );
+                    string.Format(ErrorStrings.GROUP_WRONG_ID_ERROR, num),
+                    StatusCodes.Status404NotFound
+                );
 
-            var thisGroup = await _context.Groups.FirstOrDefaultAsync(x => x.Number == num);
             var startDate = DateOnly.FromDateTime(start);
             var endDate = DateOnly.FromDateTime(end);
-
-            var response = new List<LessonDTO>();
 
             var lessons = await _context.ScheduledLessons.
                 Include(x => x.BaseLesson).ThenInclude(cab => cab.Cabinet).
@@ -48,41 +46,7 @@ namespace Schedule.Services.Classes
                     x.BaseLesson.Groups.Contains(thisGroup))
                 .ToListAsync();
 
-            foreach (var lesson in lessons)
-            {
-                List<int> groups = new List<int>();
-                foreach (var group in lesson.BaseLesson.Groups)
-                {
-                    groups.Add(group.Number);
-                }
-
-                var dateReplacemnt = new DateOnly();
-                response.Add(new LessonDTO
-                {
-                    Id = lesson.Id,
-                    Lesson = new LessonShortDto
-                    {
-                        Id = lesson.BaseLesson.Id,
-                        Teacher = lesson.BaseLesson.Teacher.Name,
-                        Subject = lesson.BaseLesson.Subject.Name,
-                        Groups = groups,
-                        Type = lesson.BaseLesson.Type,
-                        Cabinet = new CabinetDTO
-                        {
-                            Name = lesson.BaseLesson.Cabinet.Name,
-                            Number = lesson.BaseLesson.Cabinet.Number
-                        }
-                    },
-                    Timeslot = new TimeslotDTO
-                    {
-                        Id = lesson.Timeslot.Id,
-                        startAt = dateReplacemnt.ToDateTime(lesson.Timeslot.StartsAt),
-                        endsAt = dateReplacemnt.ToDateTime(lesson.Timeslot.EndsAt)
-                    },
-                    Date = lesson.Date.ToDateTime(new TimeOnly(0, 0))
-                });
-            }
-            return new LessonListDto { Lessons = response };
+            return _educationalEntityService.CreateLessonResponse(lessons);
         }
 
         public async Task<LessonListDto> GetUserSchedule(Guid userId, DateTime start, DateTime end)

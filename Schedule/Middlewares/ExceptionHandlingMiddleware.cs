@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Schedule.Exceptions;
 
 namespace Schedule.Middlewares
 {
@@ -13,29 +14,42 @@ namespace Schedule.Middlewares
             {
                 await _next.Invoke(context);
             }
+            catch (DetailedException e)
+            {
+                await ManageResponse(context, e);
+            }
             catch (BadHttpRequestException e)
             {
-                await Response(
-                    context,
-                    e.StatusCode,
-                    e.Message
-                    );
+                await ManageResponse(context, e);
             }
-            catch (Exception e)
+            catch (IOException e)
             {
-                await Response(
-                    context,
-                    StatusCodes.Status500InternalServerError,
-                    e.Message
-                    );
+                await ManageResponse(context, e);
             }
+
         }
-        private static async Task Response(HttpContext context, int statusCode, string message)
+        private static async Task ManageResponse(HttpContext context, IOException ex)
         {
-            context.Response.StatusCode = statusCode;
+            await SendResponse(context, StatusCodes.Status500InternalServerError, new { error = new { message = ex.Message } });
+        }
+
+        private static async Task ManageResponse(HttpContext context, BadHttpRequestException ex)
+        {
+            await SendResponse(context, ex.StatusCode, new { errors = new { message = ex.Message } });
+        }
+
+        private static async Task ManageResponse(HttpContext context, DetailedException ex)
+        {
+            var response = new { errors = new { message = ex.Message, details = ex.Details } };
+            await SendResponse(context, ex.StatusCode, response);
+        }
+
+        private static async Task SendResponse(HttpContext context, int statusCode, object descr)
+        {
             context.Response.ContentType = "application/json";
+            context.Response.StatusCode = statusCode;
             await context.Response.WriteAsync(
-                JsonConvert.SerializeObject(new {error = message})
+                JsonConvert.SerializeObject(descr)
                 );
         }
     }
