@@ -111,7 +111,7 @@ namespace Schedule.Services.Classes
 
             if (rt is null || rt.Expiry < DateTime.UtcNow)
             {
-                throw new BadHttpRequestException(string.Empty, StatusCodes.Status401Unauthorized);
+                throw new BadHttpRequestException("Refresh token is invalid or expired", StatusCodes.Status400BadRequest);
             }
 
             return await Login(rt.User);

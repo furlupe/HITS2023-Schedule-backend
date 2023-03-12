@@ -4,16 +4,19 @@ using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Services.Interfaces;
 using Schedule.Utils;
+using System;
 
 namespace Schedule.Services.Classes
 {
     public class LessonService : ILessonService
     {
         private readonly ApplicationContext _context;
+        private readonly IEntityScheduleService _entityScheduleService;
 
-        public LessonService(ApplicationContext context)
+        public LessonService(ApplicationContext context, IEntityScheduleService entityScheduleService)
         {
             _context = context;
+            _entityScheduleService = entityScheduleService;
         }
 
         public async Task CreateLesson(LessonCreateDTO lesson)
@@ -254,6 +257,24 @@ namespace Schedule.Services.Classes
                 });
             }
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<LessonDTO> GetScheduledLesson(Guid id)
+        {
+            var lesson = await _context.ScheduledLessons
+                .Include(x => x.BaseLesson)
+                    .ThenInclude(cab => cab.Cabinet)
+                .Include(x => x.BaseLesson)
+                    .ThenInclude(sub => sub.Subject)
+                .Include(x => x.BaseLesson)
+                    .ThenInclude(th => th.Teacher)
+                .Include(x => x.BaseLesson)
+                    .ThenInclude(gr => gr.Groups)
+                .Include(x => x.Timeslot)
+                .SingleOrDefaultAsync(sl => sl.Id == id)
+                ?? throw new BadHttpRequestException("No such scheduled lesson");
+
+            return _entityScheduleService.CreateSingleLessonResponse(lesson);
         }
     }
 }
