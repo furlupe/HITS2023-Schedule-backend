@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Services.Interfaces;
 using Schedule.Utils;
@@ -14,6 +15,21 @@ namespace Schedule.Services.Classes
             _context = context;
             _educationalEntityService = educationalEntityService;
         }
+
+        public async Task AddGroup(GroupDto group)
+        {
+            await _context.Groups.AddAsync(new Group
+            {
+                Number = group.Number
+            });
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteGroup(int number)
+        {
+            await _context.Groups.Where(g => g.Number == number).ExecuteDeleteAsync();
+        }
+
         public async Task<GroupListDto> GetAllGroups()
         {
             var response = new List<int>();

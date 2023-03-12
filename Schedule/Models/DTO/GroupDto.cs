@@ -2,10 +2,9 @@
 
 namespace Schedule.Models.DTO
 {
-    public class CabinetDTO
+    public class GroupDto
     {
         [Required]
         public int Number { get; set; }
-        public string? Name { get; set; }
     }
 }

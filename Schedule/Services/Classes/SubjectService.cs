@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Services.Interfaces;
 using Schedule.Utils;
@@ -12,6 +13,21 @@ namespace Schedule.Services.Classes
         {
             _context = context;
         }
+
+        public async Task AddSubject(SubjectShortDto subject)
+        {
+            await _context.Subjects.AddAsync(new Subject
+            {
+                Name = subject.Name
+            });
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteSubject(Guid id)
+        {
+            await _context.Subjects.Where(s => s.Id == id).ExecuteDeleteAsync();
+        }
+
         public async Task<SubjectListDto> GetSubjects()
         {
             var response = new List<SubjectDto>();

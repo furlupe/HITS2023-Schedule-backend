@@ -59,7 +59,6 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRandomStringGenerator, RandomStringGenerator>();
-builder.Services.AddTransient<IAuthorizationHandler, BlacklistAuthRequirementHandler>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<ILessonService, LessonService>();
 builder.Services.AddTransient<ISubjectService, SubjectService>();
@@ -68,13 +67,6 @@ builder.Services.AddTransient<ICabinetService, CabinetService>();
 builder.Services.AddTransient<ITeacherService, TeacherService>();
 builder.Services.AddTransient<IGroupService, GroupService>();
 builder.Services.AddTransient<IEntityScheduleService, EntityScheduleService>();
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy(
-        "NotBlacklisted",
-        policy => policy.Requirements.Add(new BlacklistAuthRequirement()));
-});
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

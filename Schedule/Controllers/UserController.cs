@@ -19,12 +19,12 @@ namespace Schedule.Controllers
             _userService = userService;
         }
         [HttpGet]
-        [Authorize(Policy = "NotBlacklisted")]
+        [Authorize]
         public async Task<ActionResult<UserListDto>> GetListOfUsers([FromQuery(Name = "role")] ICollection<RoleEnum> roles)
             => Ok(await _userService.GetUsers(roles));
 
         [HttpGet("me")]
-        [Authorize(Policy = "NotBlacklisted")]
+        [Authorize]
         public async Task<ActionResult<UserInfoDto>> GetUser()
         {
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
@@ -35,15 +35,13 @@ namespace Schedule.Controllers
         }
 
         [HttpGet("{id}")]
-        [RoleAuthorization(RoleEnum.ADMIN | RoleEnum.ROOT)]
-        [Authorize(Policy = "NotBlacklisted")]
+        [RoleAuthorization(RoleEnum.ADMIN, RoleEnum.ROOT)]
         public async Task<ActionResult<UserInfoDto>> GetUser([BindRequired] Guid id)
             => Ok(await _userService.GetUser(id));
         
 
         [HttpPut("{id}")]
-        [RoleAuthorization(RoleEnum.ADMIN | RoleEnum.ROOT)]
-        [Authorize(Policy = "NotBlacklisted")]
+        [RoleAuthorization(RoleEnum.ADMIN, RoleEnum.ROOT)]
         public async Task<IActionResult> UpdateUser([BindRequired] Guid id, UserShortInfoDto data)
         {
             var senderRoles = AccessRoles(User.Claims);
@@ -64,8 +62,7 @@ namespace Schedule.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RoleAuthorization(RoleEnum.ADMIN | RoleEnum.ROOT)]
-        [Authorize(Policy = "NotBlacklisted")]
+        [RoleAuthorization(RoleEnum.ADMIN, RoleEnum.ROOT)]
         public async Task<IActionResult> DeleteUser([BindRequired] Guid id)
         {
             var senderRoles = AccessRoles(User.Claims);

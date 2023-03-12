@@ -8,5 +8,6 @@
         public ICollection<Role> Roles { get; set; }
         public Teacher? TeacherProfile { get; set; }
         public Group? Group { get; set; }
+        public Uri? Avatar { get; set; }
     }
 }

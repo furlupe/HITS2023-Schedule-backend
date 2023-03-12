@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Schedule.Models;
 using Schedule.Models.DTO;
 using Schedule.Services.Interfaces;
 using Schedule.Utils;
@@ -14,6 +15,21 @@ namespace Schedule.Services.Classes
         {
             _context = context;
             _educationalEntityService = educationalEntityService;
+        }
+
+        public async Task AddCabinet(CabinetDTO cabinet)
+        {
+            await _context.Cabinets.AddAsync(new Cabinet
+            {
+                Name = cabinet.Name,
+                Number = cabinet.Number
+            });
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteCabinet(int number)
+        {
+            await _context.Cabinets.Where(c => c.Number == number).ExecuteDeleteAsync();
         }
 
         public async Task<CabinetListDto> GetAllCabinets()

@@ -45,17 +45,16 @@ namespace Schedule.Services.Classes
             return await Login(user);
         }
 
-        public async Task Logout(string token)
+        public async Task Logout(string token, Guid userId)
         {
-            await _context.Blacklist.AddAsync(new BlacklistedToken
-            {
-                Value = token
-            });
+            await _context.RefreshTokens
+                .Where(t => t.User.Id == userId)
+                .ExecuteDeleteAsync();
 
             await _context.SaveChangesAsync();
         }
 
-        public async Task Register(RegistrationDTO user)
+        public async Task Register(RegistrationDto user)
         {
             var group = await _context.Groups.SingleOrDefaultAsync(g => g.Number == user.GroupNumber);
 
@@ -96,7 +95,8 @@ namespace Schedule.Services.Classes
                 Password = Credentials.EncodePassword(user.Password),
                 Roles = roles,
                 TeacherProfile = teacher,
-                Group = group
+                Group = group,
+                Avatar = user.AvatarLink
             });
 
             await _context.SaveChangesAsync();

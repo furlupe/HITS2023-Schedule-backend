@@ -57,7 +57,8 @@ namespace Schedule.Services.Classes
                         Id = user.TeacherProfile.Id, 
                         Name = user.TeacherProfile.Name
                     },
-                    Group = user.Group?.Number
+                    Group = user.Group?.Number,
+                    AvatarLink = user.Avatar
                 });
             }
 
@@ -76,7 +77,8 @@ namespace Schedule.Services.Classes
                     Id = user.TeacherProfile.Id, 
                     Name = user.TeacherProfile.Name 
                 },
-                Group = user.Group?.Number
+                Group = user.Group?.Number,
+                AvatarLink = user.Avatar
             };
         }
 
@@ -100,7 +102,7 @@ namespace Schedule.Services.Classes
                     );
             }
 
-            if (teacher is not null && await _context.Users.AnyAsync(u => u.TeacherProfile == teacher))
+            if (teacher is not null && await _context.Users.AnyAsync(u => u.TeacherProfile == teacher && u.Id != id))
             {
                 throw new BadHttpRequestException(
                     string.Format(ErrorStrings.TEACHER_ACCOUNT_EXISTS_ERROR, teacher.Id),
@@ -116,6 +118,7 @@ namespace Schedule.Services.Classes
             user.Roles = await _context.Roles.Where(r => data.Roles.Contains(r.Value)).ToListAsync();
             user.Group = group;
             user.TeacherProfile = teacher;
+            user.Avatar = data.Avatar;
 
             await _context.SaveChangesAsync();
         }

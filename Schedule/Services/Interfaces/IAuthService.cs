@@ -4,12 +4,12 @@ namespace Schedule.Services.Interfaces
 {
     public interface IAuthService
     {
-        Task Register(RegistrationDTO user);
+        Task Register(RegistrationDto user);
 
         Task<TokensDto> MobileLogin(LoginCredentials user);
         Task<TokensDto> WebLogin(LoginCredentials user);
 
-        Task Logout(string token);
+        Task Logout(string token, Guid userId);
 
         Task<TokensDto> Refresh(string token);
     }
