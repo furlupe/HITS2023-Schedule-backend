@@ -11,5 +11,6 @@ namespace Schedule.Models.DTO
         public ICollection<RoleEnum> Roles { get; set; }
         public TeacherDTO? TeacherId { get; set; }
         public int? Group { get; set; }
+        public Uri? AvatarLink { get; set; }
     }
 }

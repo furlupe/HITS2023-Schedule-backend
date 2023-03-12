@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Schedule.Enums;
 using Schedule.Models.DTO;
+using Schedule.Services.Classes;
 using Schedule.Services.Interfaces;
 using Schedule.Utils;
 using System.Security.Claims;
@@ -26,7 +27,6 @@ namespace Schedule.Controllers
 
         [HttpGet("me/schedule")]
         [RoleAuthorization(RoleEnum.STUDENT | RoleEnum.TEACHER)]
-        [Authorize(Policy = "NotBlacklisted")]
         public async Task<ActionResult<LessonListDto>> GetUserSchedule(
             [BindRequired] DateTime startsAt,
             [BindRequired] DateTime endsAt)
@@ -43,6 +43,14 @@ namespace Schedule.Controllers
             [BindRequired] DateTime endsAt)
         {
             return Ok(await _groupService.GetSchedule(number, startsAt, endsAt));
+        }
+
+        [HttpPost]
+        [RoleAuthorization(RoleEnum.ADMIN, RoleEnum.ROOT)]
+        public async Task<IActionResult> AddGroup(GroupDto group)
+        {
+            await _groupService.AddGroup(group);
+            return StatusCode(StatusCodes.Status204NoContent);
         }
     }
 }

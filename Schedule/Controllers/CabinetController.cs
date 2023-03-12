@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Schedule.Enums;
 using Schedule.Models.DTO;
 using Schedule.Services.Interfaces;
+using Schedule.Utils;
 
 namespace Schedule.Controllers
 {
@@ -30,6 +32,14 @@ namespace Schedule.Controllers
             [BindRequired] DateTime endsAt)
         {
             return Ok(await _cabinetService.GetSchedule(number, startsAt, endsAt));
+        }
+
+        [HttpPost]
+        [RoleAuthorization(RoleEnum.ADMIN, RoleEnum.ROOT)]
+        public async Task<IActionResult> AddCabinet(CabinetDTO cabinet)
+        {
+            await _cabinetService.AddCabinet(cabinet);
+            return StatusCode(StatusCodes.Status204NoContent);
         }
     }
 }

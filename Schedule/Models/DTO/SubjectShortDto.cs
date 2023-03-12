@@ -2,9 +2,9 @@
 
 namespace Schedule.Models.DTO
 {
-    public class TeacherDTO
+    public class SubjectShortDto
     {
-        public Guid Id { get; set; }
+        [Required]
         public string Name { get; set; }
     }
 }

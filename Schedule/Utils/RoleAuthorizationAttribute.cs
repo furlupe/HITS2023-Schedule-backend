@@ -5,9 +5,10 @@ namespace Schedule.Utils
 {
     public class RoleAuthorizationAttribute : AuthorizeAttribute
     {
-        public RoleAuthorizationAttribute(RoleEnum role)
+        public RoleAuthorizationAttribute(params RoleEnum[] roles)
         {
-            Roles = role.ToString().Replace(" ", string.Empty);
+            var stringRoles = roles.Select(role => role.ToString()).ToArray();
+            Roles = string.Join(",", stringRoles);
         }
     }
 }

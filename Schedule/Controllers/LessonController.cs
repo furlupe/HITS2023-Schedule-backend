@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Schedule.Enums;
 using Schedule.Models.DTO;
@@ -18,43 +19,43 @@ namespace Schedule.Controllers
             _lessonService = lessonService;
         }
         [HttpPost]
-        [RoleAuthorization(RoleEnum.EDITOR | RoleEnum.ADMIN | RoleEnum.ROOT)]
+        [RoleAuthorization(RoleEnum.ADMIN, RoleEnum.EDITOR, RoleEnum.ROOT)]
         public async Task<IActionResult> CreateLesson(LessonCreateDTO lesson)
         {
             await _lessonService.CreateLesson(lesson);
-            return Ok();
+            return StatusCode(StatusCodes.Status204NoContent);
         }
 
         [HttpPut("single/{id}")]
-        [RoleAuthorization(RoleEnum.EDITOR | RoleEnum.ADMIN | RoleEnum.ROOT)]
+        [RoleAuthorization(RoleEnum.ADMIN, RoleEnum.EDITOR, RoleEnum.ROOT)]
         public async Task<IActionResult> UpdateLesson(SingleLessonEditDto lesson, [BindRequired] Guid id)
         {
             await _lessonService.EditSingleLesson(lesson, id);
-            return Ok();
+            return StatusCode(StatusCodes.Status204NoContent);
         }
 
         [HttpPut("all/{id}")]
-        [RoleAuthorization(RoleEnum.EDITOR | RoleEnum.ADMIN | RoleEnum.ROOT)]
+        [RoleAuthorization(RoleEnum.ADMIN, RoleEnum.EDITOR, RoleEnum.ROOT)]
         public async Task<IActionResult> UpdateLesson(LessonCreateDTO lesson, [BindRequired] Guid id)
         {
             await _lessonService.EditAllLessons(lesson, id);
-            return Ok();
+            return StatusCode(StatusCodes.Status204NoContent);
         }
 
         [HttpDelete("single/{id}")]
-        [RoleAuthorization(RoleEnum.EDITOR | RoleEnum.ADMIN | RoleEnum.ROOT)]
+        [RoleAuthorization(RoleEnum.ADMIN, RoleEnum.EDITOR, RoleEnum.ROOT)]
         public async Task<IActionResult> RemoveSingleLesson([BindRequired] Guid id)
         {
             await _lessonService.DeleteSingleLesson(id);
-            return Ok();
+            return StatusCode(StatusCodes.Status204NoContent);
         }
 
         [HttpDelete("all/{id}")]
-        [RoleAuthorization(RoleEnum.EDITOR | RoleEnum.ADMIN | RoleEnum.ROOT)]
+        [RoleAuthorization(RoleEnum.ADMIN, RoleEnum.EDITOR, RoleEnum.ROOT)]
         public async Task<IActionResult> RemoveAllLesson([BindRequired] Guid id)
         {
             await _lessonService.DeleteAllLessons(id);
-            return Ok();
+            return StatusCode(StatusCodes.Status204NoContent);
         }
     }
 }

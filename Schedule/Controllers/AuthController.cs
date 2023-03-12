@@ -23,8 +23,7 @@ namespace Schedule.Controllers
             => Ok(await _authService.Refresh(token));
 
         [HttpPost("register")]
-        [RoleAuthorization(RoleEnum.ADMIN | RoleEnum.ROOT)]
-        [Authorize(Policy = "NotBlacklisted")]
+        [RoleAuthorization(RoleEnum.ADMIN, RoleEnum.ROOT)]
         public async Task<IActionResult> Register(RegistrationDto user)
         {
             var roleClaims = User.Claims.Where(c => c.Type == ClaimTypes.Role);
@@ -49,7 +48,7 @@ namespace Schedule.Controllers
             }
 
             await _authService.Register(user);
-            return Ok();
+            return StatusCode(StatusCodes.Status204NoContent);
         }
 
         [HttpPost("login/mobile")]
@@ -60,11 +59,14 @@ namespace Schedule.Controllers
         public async Task<IActionResult> WebLogin(LoginCredentials credentials)
             => Ok(await _authService.WebLogin(credentials));
 
-        [Authorize(Policy = "NotBlacklisted")]
+        [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
-            await _authService.Logout(Request.Headers.Authorization);
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+            Guid.TryParse(userIdClaim.Value, out Guid userId);
+
+            await _authService.Logout(Request.Headers.Authorization, userId);
             return Ok();
         }
     }

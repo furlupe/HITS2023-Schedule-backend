@@ -3,10 +3,10 @@
     [Flags]
     public enum RoleEnum
     {
-        STUDENT,
-        TEACHER,
-        EDITOR,
-        ADMIN,
-        ROOT,
+        STUDENT = 0,
+        TEACHER = 1,
+        EDITOR = 2,
+        ADMIN = 3,
+        ROOT = 4,
     }
 }

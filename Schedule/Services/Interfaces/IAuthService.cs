@@ -9,7 +9,7 @@ namespace Schedule.Services.Interfaces
         Task<TokensDto> MobileLogin(LoginCredentials user);
         Task<TokensDto> WebLogin(LoginCredentials user);
 
-        Task Logout(string token);
+        Task Logout(string token, Guid userId);
 
         Task<TokensDto> Refresh(string token);
     }

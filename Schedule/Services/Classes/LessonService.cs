@@ -65,7 +65,7 @@ namespace Schedule.Services.Classes
                     });
             }
 
-            if (l.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
+            if (l.Date < DateOnly.FromDateTime(DateTime.UtcNow))
             {
                 throw new BadHttpRequestException("You can't change lessons from the past!");
             }
@@ -117,7 +117,7 @@ namespace Schedule.Services.Classes
                 .SingleOrDefaultAsync(l => l.Id == id)
                 ?? throw new BadHttpRequestException("No such scheduled lesson");
 
-            if(l.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
+            if(l.Date < DateOnly.FromDateTime(DateTime.UtcNow))
             {
                 throw new BadHttpRequestException("You can't delete lessons from the past!");
             }
@@ -132,7 +132,9 @@ namespace Schedule.Services.Classes
                 .SingleOrDefaultAsync(l => l.Id == id)
                 ?? throw new BadHttpRequestException("No such lesson");
 
-            _context.Lessons.Remove(l);
+            await _context.ScheduledLessons
+                .Where(sl => sl.BaseLesson == l && sl.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
+                .ExecuteDeleteAsync();
 
             await _context.SaveChangesAsync();
         }

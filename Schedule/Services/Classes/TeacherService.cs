@@ -75,5 +75,20 @@ namespace Schedule.Services.Classes
             }
             return teacher.Name;
         }
+
+        public async Task AddTeacher(TeacherShortDto teacher)
+        {
+            await _context.Teachers.AddAsync(new Teacher
+            {
+                Name = teacher.Name
+            });
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteTeacher(Guid id)
+        {
+            await _context.Teachers.Where(t => t.Id == id).ExecuteDeleteAsync();
+        }
     }
 }

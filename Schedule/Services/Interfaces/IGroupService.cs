@@ -7,5 +7,7 @@ namespace Schedule.Services.Interfaces
         Task<GroupListDto> GetAllGroups();
         Task<LessonListDto> GetSchedule(int num, DateTime start, DateTime end);
         Task<LessonListDto> GetUserSchedule(Guid userId, DateTime start, DateTime end);
+        Task AddGroup(GroupDto group);
+        Task DeleteGroup(int number);
     }
 }

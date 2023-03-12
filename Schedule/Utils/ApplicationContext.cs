@@ -14,7 +14,6 @@ namespace Schedule.Utils
         public DbSet<LessonScheduled> ScheduledLessons { get; set; }
         public DbSet<Timeslot> Timeslots { get; set; }
         public DbSet<Subject> Subjects { get; set; }
-        public DbSet<BlacklistedToken> Blacklist { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
@@ -27,6 +26,11 @@ namespace Schedule.Utils
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Login)
                 .IsUnique();
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Group)
+                .WithMany(g => g.Students)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Lesson>()
                 .HasMany(l => l.Groups)
