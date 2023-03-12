@@ -54,8 +54,8 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            RolesId = new Guid("fc2e29cc-b4c4-4d31-a589-2311b10d80b6"),
-                            UsersId = new Guid("03b73341-2cfc-4d33-b0e7-7f131bfe21ec")
+                            RolesId = new Guid("0aae5047-0bcc-400c-a4d6-a5f11205ef29"),
+                            UsersId = new Guid("8c130293-5c53-4c90-92f5-90c64b2578a6")
                         });
                 });
 
@@ -68,7 +68,6 @@ namespace Schedule.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Number"));
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Number");
@@ -90,6 +89,48 @@ namespace Schedule.Migrations
                         {
                             Number = 103,
                             Name = "Cabinet No. 103"
+                        },
+                        new
+                        {
+                            Number = 211,
+                            Name = "Chill cabinet"
+                        },
+                        new
+                        {
+                            Number = 222,
+                            Name = "Toilet"
+                        },
+                        new
+                        {
+                            Number = 451,
+                            Name = "Denis' basement"
+                        },
+                        new
+                        {
+                            Number = 333,
+                            Name = "Computer class"
+                        },
+                        new
+                        {
+                            Number = 452,
+                            Name = "Hell"
+                        },
+                        new
+                        {
+                            Number = 123,
+                            Name = "Sussy spaceship"
+                        },
+                        new
+                        {
+                            Number = 141
+                        },
+                        new
+                        {
+                            Number = 332
+                        },
+                        new
+                        {
+                            Number = 443
                         });
                 });
 
@@ -113,6 +154,30 @@ namespace Schedule.Migrations
                         new
                         {
                             Number = 972203
+                        },
+                        new
+                        {
+                            Number = 972102
+                        },
+                        new
+                        {
+                            Number = 972202
+                        },
+                        new
+                        {
+                            Number = 972101
+                        },
+                        new
+                        {
+                            Number = 272201
+                        },
+                        new
+                        {
+                            Number = 271805
+                        },
+                        new
+                        {
+                            Number = 271905
                         });
                 });
 
@@ -203,27 +268,27 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("3627bc72-b8c9-4b3f-a35b-1ffb09595562"),
+                            Id = new Guid("43f4b289-ceb7-4a45-b777-805db276ee85"),
                             Value = 0
                         },
                         new
                         {
-                            Id = new Guid("38e4d6a9-78ee-45b4-8bce-3f5bbf69d4fa"),
+                            Id = new Guid("39194cef-ab19-4a22-8fa5-4eb31bdaa23e"),
                             Value = 1
                         },
                         new
                         {
-                            Id = new Guid("ca68faba-65fd-4cf8-ac52-fd0bd33a4569"),
+                            Id = new Guid("13f61564-b811-481c-8906-96731a2d9b19"),
                             Value = 2
                         },
                         new
                         {
-                            Id = new Guid("557e5a64-e05b-4ae6-8888-ecac386c34e1"),
+                            Id = new Guid("e89c5098-b21f-495e-8e86-bcda9cc0a9ea"),
                             Value = 3
                         },
                         new
                         {
-                            Id = new Guid("fc2e29cc-b4c4-4d31-a589-2311b10d80b6"),
+                            Id = new Guid("0aae5047-0bcc-400c-a4d6-a5f11205ef29"),
                             Value = 4
                         });
                 });
@@ -238,35 +303,50 @@ namespace Schedule.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("TeacherId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("TeacherId");
 
                     b.ToTable("Subjects");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7ca78f8a-cae5-4c86-9a18-9c137c1291cd"),
+                            Id = new Guid("c99e7876-17c5-4aaf-bbfc-3d5ad41b2302"),
                             Name = "Albebra"
                         },
                         new
                         {
-                            Id = new Guid("ff3fee59-1620-48df-af62-05495ff1d631"),
+                            Id = new Guid("9b81c63e-ef4a-4b9a-9dc0-64e070bbd88a"),
                             Name = "English language"
                         },
                         new
                         {
-                            Id = new Guid("70d70b75-848f-48c3-ad30-5e79b5394319"),
+                            Id = new Guid("14e248e5-90e1-488b-9ee1-91540df45420"),
                             Name = "Programming"
                         },
                         new
                         {
-                            Id = new Guid("6646c9f5-541f-4f74-bca9-a29724da2abf"),
+                            Id = new Guid("c8b2676d-a5bb-4e67-b9e4-484627252ae7"),
                             Name = "Amogusing"
+                        },
+                        new
+                        {
+                            Id = new Guid("05acddde-9cab-4fb2-94f8-b70536fc08f7"),
+                            Name = "Meth cooking"
+                        },
+                        new
+                        {
+                            Id = new Guid("db58ddae-5b8e-41f0-9894-27307fd92da1"),
+                            Name = "Russian language"
+                        },
+                        new
+                        {
+                            Id = new Guid("72d28952-ea88-487a-b805-7d5b54db4ccd"),
+                            Name = "Requirements development"
+                        },
+                        new
+                        {
+                            Id = new Guid("783cda7b-6fd6-4547-a1a5-eaf217dcedbb"),
+                            Name = "Linear bebra"
                         });
                 });
 
@@ -287,13 +367,43 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("44b23b85-d977-4c21-971a-5a0c58fbb004"),
+                            Id = new Guid("8384666a-473d-4adf-9479-5283f51a7483"),
                             Name = "Amogus Ballser"
                         },
                         new
                         {
-                            Id = new Guid("9211bba3-fd2a-4ea3-a5b7-c24c86fbc4a3"),
+                            Id = new Guid("89a041f6-6a44-42ab-a60b-c7a28f7421d4"),
                             Name = "Name Name Teacher"
+                        },
+                        new
+                        {
+                            Id = new Guid("753c1536-f2f7-4c58-a695-bfa2acc7fbd2"),
+                            Name = "Zenis Dmeev"
+                        },
+                        new
+                        {
+                            Id = new Guid("866b419d-ea60-48b7-bb78-629ab9df7252"),
+                            Name = "Ilia Volgin"
+                        },
+                        new
+                        {
+                            Id = new Guid("7a45f422-5c96-46c4-8fae-fdcf20965b67"),
+                            Name = "Neel Kiggers"
+                        },
+                        new
+                        {
+                            Id = new Guid("2ee6511d-c549-4684-9752-b5da3be00692"),
+                            Name = "Nuck Figgers"
+                        },
+                        new
+                        {
+                            Id = new Guid("5c1d75d3-ff22-45c1-a0c2-b4530c3654c6"),
+                            Name = "Walter White"
+                        },
+                        new
+                        {
+                            Id = new Guid("781722b7-bcbc-4063-943c-24d04f92207a"),
+                            Name = "Kid named Finger"
                         });
                 });
 
@@ -316,21 +426,45 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a4f6613d-562d-4792-bc4f-0a314f81144a"),
+                            Id = new Guid("3873edf2-e98b-49a2-bfd3-65b9b78641b1"),
                             EndsAt = new TimeOnly(10, 20, 0),
                             StartsAt = new TimeOnly(8, 45, 0)
                         },
                         new
                         {
-                            Id = new Guid("da6e1024-7132-4df2-aadb-31179096381e"),
+                            Id = new Guid("c9fd8e36-228d-421d-a1d4-dec748a1d68b"),
                             EndsAt = new TimeOnly(12, 10, 0),
                             StartsAt = new TimeOnly(10, 35, 0)
                         },
                         new
                         {
-                            Id = new Guid("4961f0f1-b94d-41ac-95f6-4fab2f04b924"),
+                            Id = new Guid("01d980ed-c45e-4604-a824-35f17d63e015"),
                             EndsAt = new TimeOnly(14, 0, 0),
                             StartsAt = new TimeOnly(12, 25, 0)
+                        },
+                        new
+                        {
+                            Id = new Guid("880f1384-3364-4e56-afb3-2f129b8cae80"),
+                            EndsAt = new TimeOnly(16, 20, 0),
+                            StartsAt = new TimeOnly(14, 45, 0)
+                        },
+                        new
+                        {
+                            Id = new Guid("5cd9209b-b6bb-43ef-a235-e6d4f8045fa5"),
+                            EndsAt = new TimeOnly(18, 10, 0),
+                            StartsAt = new TimeOnly(16, 35, 0)
+                        },
+                        new
+                        {
+                            Id = new Guid("9d5dfef8-ae1e-467c-9305-0f5120487209"),
+                            EndsAt = new TimeOnly(20, 0, 0),
+                            StartsAt = new TimeOnly(18, 25, 0)
+                        },
+                        new
+                        {
+                            Id = new Guid("31d17042-4df5-462b-9206-ce3e4815d2d6"),
+                            EndsAt = new TimeOnly(21, 50, 0),
+                            StartsAt = new TimeOnly(20, 15, 0)
                         });
                 });
 
@@ -371,7 +505,7 @@ namespace Schedule.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("03b73341-2cfc-4d33-b0e7-7f131bfe21ec"),
+                            Id = new Guid("8c130293-5c53-4c90-92f5-90c64b2578a6"),
                             Login = "furlupe",
                             Password = "3414A9BE42AE5049DD6DBEE1E2C70A986C2E5C20B6E7BF3DDA103678FDDAA7DB"
                         });
@@ -464,13 +598,6 @@ namespace Schedule.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Schedule.Models.Subject", b =>
-                {
-                    b.HasOne("Schedule.Models.Teacher", null)
-                        .WithMany("Subjects")
-                        .HasForeignKey("TeacherId");
-                });
-
             modelBuilder.Entity("Schedule.Models.User", b =>
                 {
                     b.HasOne("Schedule.Models.Group", "Group")
@@ -490,11 +617,6 @@ namespace Schedule.Migrations
             modelBuilder.Entity("Schedule.Models.Group", b =>
                 {
                     b.Navigation("Students");
-                });
-
-            modelBuilder.Entity("Schedule.Models.Teacher", b =>
-                {
-                    b.Navigation("Subjects");
                 });
 #pragma warning restore 612, 618
         }

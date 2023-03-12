@@ -81,6 +81,10 @@ namespace Schedule.Services.Classes
         public async Task EditAllLessons(LessonCreateDTO lesson, Guid id)
         {
             var l = await _context.Lessons
+                .Include(l => l.Groups)
+                .Include(l => l.Teacher)
+                .Include(l => l.Subject)
+                .Include(l => l.Cabinet)
                 .SingleOrDefaultAsync(l => l.Id == id)
                 ?? throw new BadHttpRequestException("No such lesson");
 
@@ -99,16 +103,11 @@ namespace Schedule.Services.Classes
                     timeslot
                 );
 
-            _context.Entry(l).CurrentValues.SetValues(new
-            {
-                newLesson.Cabinet,
-                newLesson.Groups,
-                newLesson.Subject,
-                newLesson.Teacher,
-                newLesson.Type
-            });
-
-            await _context.SaveChangesAsync();
+            l.Cabinet = newLesson.Cabinet;
+            l.Groups = newLesson.Groups;
+            l.Subject = newLesson.Subject;
+            l.Teacher = newLesson.Teacher;
+            l.Type = newLesson.Type;
 
             await _context.SaveChangesAsync();
             await RescheduleLessons(l, lessonPeriod, lesson.Day, timeslot);
@@ -243,6 +242,12 @@ namespace Schedule.Services.Classes
             var startDate = GetClosestDateWithDay(period.Start, day);
             foreach (var sl in allScheduledLessons)
             {
+                if (sl.Date > period.End || sl.Date < period.Start)
+                {
+                    _context.ScheduledLessons.Remove(sl);
+                    continue;
+                }
+
                 if (startDate > period.End) break;
 
                 sl.Date = startDate;
@@ -264,9 +269,6 @@ namespace Schedule.Services.Classes
             }
 
             await _context.SaveChangesAsync();
-            await _context.ScheduledLessons
-                .Where(sl => sl.Date > period.End)
-                .ExecuteDeleteAsync();
         }
         private async Task ScheduleLessons(Lesson lesson, Period period, DayOfWeek day, Timeslot timeslot)
         {
