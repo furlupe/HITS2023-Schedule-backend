@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Schedule.Enums;
 using Schedule.Models.DTO;
 using Schedule.Services.Interfaces;
@@ -19,7 +20,7 @@ namespace Schedule.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<ActionResult<TokensDto>> Refresh([FromQuery] string token)
+        public async Task<ActionResult<TokensDto>> Refresh([FromQuery, BindRequired] string token)
             => Ok(await _authService.Refresh(token));
 
         [HttpPost("register")]

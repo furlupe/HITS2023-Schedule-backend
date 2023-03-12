@@ -57,5 +57,12 @@ namespace Schedule.Controllers
             await _lessonService.DeleteAllLessons(id);
             return StatusCode(StatusCodes.Status204NoContent);
         }
+
+        [HttpGet("{id}")]
+        [RoleAuthorization(RoleEnum.ADMIN, RoleEnum.EDITOR, RoleEnum.ROOT)]
+        public async Task<ActionResult<LessonDTO>> GetScheduledLesson([BindRequired] Guid id)
+        {
+            return Ok(await _lessonService.GetScheduledLesson(id));
+        }
     }
 }

@@ -9,5 +9,6 @@ namespace Schedule.Services.Interfaces
         Task EditAllLessons(LessonCreateDTO lesson, Guid id);
         Task DeleteSingleLesson(Guid id);
         Task DeleteAllLessons(Guid id);
+        Task<LessonDTO> GetScheduledLesson(Guid id);
     }
 }
