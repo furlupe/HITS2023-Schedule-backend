@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.OpenApi.Models;
 using Schedule.Middlewares;
 using Schedule.Services.Classes;
@@ -96,6 +97,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    using (var context = scope.ServiceProvider.GetService<ApplicationContext>())
+    {
+        await context.Database.MigrateAsync();
+    }
+}
 
 // Configure the HTTP request pipeline.
 app.UseSwagger();

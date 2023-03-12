@@ -82,10 +82,13 @@ namespace Schedule.Services.Classes
                 ?? throw new BadHttpRequestException("No such lesson");
 
             var newLesson = await MakeLesson(lesson);
+            newLesson.Id = id;
+
             var timeslot = await _context.Timeslots.SingleOrDefaultAsync(t => t.Id == lesson.Timeslot)
                 ?? throw new BadHttpRequestException("No such timeslot");
 
             var lessonPeriod = new Period(lesson.StartsAt, lesson.EndsAt);
+
             await CheckIfLessonIntersects(
                     newLesson,
                     lessonPeriod,
@@ -129,13 +132,7 @@ namespace Schedule.Services.Classes
                 .SingleOrDefaultAsync(l => l.Id == id)
                 ?? throw new BadHttpRequestException("No such lesson");
 
-            _context.RemoveRange(await
-                _context.ScheduledLessons
-                .Where(les =>
-                        les.BaseLesson == l &&
-                        les.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
-                .ToListAsync()
-                );
+            _context.Lessons.Remove(l);
 
             await _context.SaveChangesAsync();
         }
@@ -178,7 +175,7 @@ namespace Schedule.Services.Classes
                         l.Date <= period.End &&
                         l.Timeslot == timeslot &&
                         l.Date.DayOfWeek == day &&
-                        l.Id != lesson.Id)
+                        l.BaseLesson.Id != lesson.Id)
                 .Include(l => l.BaseLesson.Cabinet)
                 .Include(l => l.BaseLesson.Teacher)
                 .Include(l => l.BaseLesson.Groups)
@@ -186,7 +183,7 @@ namespace Schedule.Services.Classes
 
             List<object> errors = new();
             List<LessonScheduled> ls;
-            if ((ls = lessons.Where(l => l.BaseLesson.Cabinet == lesson.Cabinet).ToList()) is not null)
+            if ((ls = lessons.Where(l => l.BaseLesson.Cabinet == lesson.Cabinet).ToList()).Count > 0)
             {
                 errors.Add(new
                 {
@@ -194,7 +191,7 @@ namespace Schedule.Services.Classes
                 });
             }
 
-            if ((ls = lessons.Where(l => l.BaseLesson.Teacher == lesson.Teacher).ToList()) is not null)
+            if ((ls = lessons.Where(l => l.BaseLesson.Teacher == lesson.Teacher).ToList()).Count > 0)
             {
                 errors.Add(new
                 {
@@ -204,7 +201,7 @@ namespace Schedule.Services.Classes
 
             if (( ls = lessons.Where(
                     l => l.BaseLesson.Groups.Any( g => lesson.Groups.Contains(g) ))
-                .ToList()) is not null)
+                .ToList()).Count > 0)
             {
                 errors.Add(new
                 {
@@ -232,18 +229,39 @@ namespace Schedule.Services.Classes
         private async Task RescheduleLessons(Lesson lesson, Period period, DayOfWeek day, Timeslot timeslot)
         {
             var allScheduledLessons = await _context.ScheduledLessons
-                .Where(les => les.BaseLesson == lesson)
+                .Where(
+                    les => 
+                        les.BaseLesson == lesson && 
+                        les.Date >= DateOnly.FromDateTime(DateTime.UtcNow))
                 .ToListAsync();
 
+            var startDate = GetClosestDateWithDay(period.Start, day);
             foreach (var sl in allScheduledLessons)
             {
-                if (sl.Date < DateOnly.FromDateTime(DateTime.UtcNow)) continue;
+                if (startDate > period.End) break;
 
-                _context.ScheduledLessons.Remove(sl);
+                sl.Date = startDate;
+                sl.Timeslot = timeslot;
+
+                startDate = startDate.AddDays(7);
+            }
+
+            while (period.End.DayNumber - startDate.DayNumber >= 7)
+            {
+                await _context.ScheduledLessons.AddAsync(new LessonScheduled
+                {
+                    BaseLesson = lesson,
+                    Date = startDate,
+                    Timeslot = timeslot
+                });
+
+                startDate = startDate.AddDays(7);
             }
 
             await _context.SaveChangesAsync();
-            await ScheduleLessons(lesson, period, day, timeslot);
+            await _context.ScheduledLessons
+                .Where(sl => sl.Date > period.End)
+                .ExecuteDeleteAsync();
         }
         private async Task ScheduleLessons(Lesson lesson, Period period, DayOfWeek day, Timeslot timeslot)
         {
